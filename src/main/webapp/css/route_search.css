@@ -1,0 +1,298 @@
+:root{ 
+  /* カラーパレット */
+  --bg: #f4f7f9; /* 明るい背景 */
+  --ink: #1f2937; /* 濃い文字色 */
+  --muted: #6b7280; /* 薄い文字色 */
+  --primary: #4f46e5; /* メインのアクセントカラー (インディゴ) */
+  --primary-hover: #4338ca;
+  --secondary: #10b981; /* サブのアクセントカラー (エメラルド) */
+  --border: #e5e7eb; /* 薄いボーダー色 */
+  --surface: #ffffff; /* カードやパネルの背景色 */
+  --danger: #dc2626; /* 危険色 (赤) */
+  /* 薄い青の定義 (Soft Blue) - 色はそのまま維持します */
+  --soft-blue: rgb(0, 128, 255); 
+  --soft-blue-hover: rgb(44, 85, 252); 
+  
+  /* 影 */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  
+  /* レイアウト */
+  --radius: 12px; /* 全体的に滑らかな角 */
+  --radius-pill: 24px;
+  /* Global UI scale for accessibility */ 
+  --ui-scale: 1.25; 
+} 
+*{box-sizing:border-box} 
+html,body{height:100%} 
+body{ 
+  margin:0;
+  /* Modern font stack for better readability */
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, Arial, sans-serif;
+  font-weight: 400; /* 線の細さを標準に */
+  color:var(--ink); 
+  background:var(--bg); 
+  /* Chrome/Edge/Chromium: scales layout proportionally */ 
+  zoom: var(--ui-scale); 
+} 
+#app{
+  padding:16px; 
+  max-width: 1200px; /* 最大幅を少し広く */
+  margin: 0 auto;
+} 
+ 
+/* Firefox fallback (no zoom support): scale the inner app and compensate width) */ 
+@supports not (zoom: 1){ 
+  #app{ 
+    transform: scale(var(--ui-scale)); 
+    transform-origin: top left; 
+    width: calc(100% / var(--ui-scale)); 
+  } 
+} 
+ 
+/* Utility Classes */
+.small{font-size: 0.8rem}
+.muted{color:var(--muted)}
+.center{
+  display:flex;
+  justify-content:center; 
+}
+ 
+/* Top bar */ 
+.top-bar{ 
+	display:flex; 
+	gap:12px; 
+	align-items:flex-start; 
+	margin-bottom:16px; 
+} 
+.btn-group-left{position:relative;display:flex;gap:12px} 
+ 
+/* Buttons */
+.btn{ 
+  border:none; /* ボーダーを削除 */
+  background:var(--surface); 
+  color:var(--ink); 
+  padding:12px 20px; 
+  cursor:pointer; 
+  font-weight: 600; /* 太字 */
+  transition: all 0.2s;
+  box-shadow: var(--shadow); 
+} 
+.btn.pill{border-radius:var(--radius-pill);} 
+.btn.circle{
+  border-radius:var(--radius-pill); 
+  padding:10px 18px; 
+  display:inline-flex; 
+  align-items:center; 
+  gap:8px;
+}
+.btn.icon-left .icon{margin-right:8px; margin-left:0}
+.btn:hover{box-shadow: 0 6px 10px rgba(0,0,0,.15); transform: translateY(-1px);}
+.btn:active{transform:translateY(1px); box-shadow: var(--shadow)} 
+
+.btn.primary{
+  background: var(--primary);
+  color: #fff;
+}
+.btn.primary:hover{
+  background: var(--primary-hover);
+}
+
+/* 薄い青のボタンスタイル（.soft）の文字色を白に変更 */
+.btn.soft{
+  background: var(--soft-blue);
+  color: #fff; /* 文字色を白に変更 */
+}
+.btn.soft:hover{
+  background: var(--soft-blue-hover);
+}
+
+/* ルート検索ボタン（#search）と観光地検索ボタン（#place-search）の幅調整 */
+#search, #place-search {
+  max-width: 180px; 
+  width: auto;
+}
+
+/* 【修正箇所】flex-direction: row; を追加して水平方向の中央寄せを有効化 */
+.field.center {
+  display: flex; 
+  flex-direction: row; /* <-- ここを追加 */
+  justify-content: center; 
+  width: 100%; 
+  flex-wrap: wrap; 
+}
+
+.mini-btn{
+  border:1px solid var(--border);
+  background:var(--surface);
+  border-radius:8px;
+  padding:6px 12px;
+  cursor:pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+} 
+.mini-btn.danger{color:var(--danger);border-color:var(--danger)} 
+.mini-btn.primary{
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.mini-btn.secondary{
+  color: var(--secondary);
+  border-color: var(--secondary);
+}
+ 
+/* Panels under buttons (Favorites/History) */ 
+.panel{
+  position:absolute;
+  top:56px;
+  left:0;
+  width:320px; /* 幅を少し狭く */
+  background:var(--surface);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow-lg); /* より目立つ影 */
+  padding:10px;
+  z-index:2000;
+  border: 1px solid var(--border); /* 薄いボーダーを追加 */
+} 
+#history-panel{left:140px; width: 340px} /* 履歴パネルの位置調整 */
+.hidden{display:none} 
+.panel-header{display:flex;justify-content:space-between;align-items:center;padding:4px 6px} 
+.panel-title{font-weight: 600; font-size: 1rem;}
+.panel-footer{padding:6px;color:var(--muted); border-top: 1px solid var(--border); margin-top: 8px;} 
+.list{list-style:none;margin:6px 0 0;padding:0;max-height:300px;overflow-y:auto; overflow-x: hidden;} /* 最大高さを上げる */
+.list li{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+  background: var(--bg); /* リストアイテムの背景色 */
+  border-radius:8px;
+  padding:10px;
+  margin-bottom:8px;
+  box-shadow: inset 0 0 0 1px var(--border);
+} 
+.list li .row{display:flex;flex-direction:column; font-size: 0.9rem;} 
+.list button{border:1px solid var(--border);background:#fff;border-radius:6px;padding:4px 8px;cursor:pointer} 
+ 
+/* Layout */ 
+.layout{display:grid;grid-template-columns:1fr 320px;gap:20px} /* サイドバーの幅を広げ、ギャップも広げる */
+.card{
+  border:none; /* ボーダーを削除 */
+  border-radius:var(--radius);
+  background:var(--surface);
+  box-shadow: var(--shadow-lg); /* 大きめの影 */
+} 
+.card.inset{
+  border-radius:10px;
+  box-shadow: none; /* insetでは影なし */
+  border: 1px solid var(--border); /* 薄いボーダーのみ */
+} 
+.map-wrap{padding:10px;} 
+.map{width:100%;height:600px;border-radius:8px;overflow:hidden;} /* マップの高さを上げる */
+ 
+/* Sidebar */ 
+.side{padding:16px;display:flex;flex-direction:column;gap:16px} /* パディングとギャップを広げる */
+ 
+/* Form Elements */
+.mode-switch{
+  display: flex;
+  justify-content: space-around;
+  background: var(--bg);
+  padding: 8px;
+  border-radius: 8px;
+}
+.mode-switch label{
+  flex-grow: 1;
+  text-align: center;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.mode-switch input[type="radio"]{
+  margin-right: 4px;
+}
+ 
+.field{display:flex;flex-direction:column;gap:6px} 
+.field label{font-weight: 500;}
+
+.text-input, .select-input{
+  height:44px; /* 高さを上げる */
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:0 12px;
+  width: 100%;
+  font-size: 1rem;
+  background-color: var(--bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+} 
+.text-input:focus, .select-input:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgb(0, 0, 255); 
+  outline: none;
+  background-color: var(--surface);
+}
+
+.select-input{
+  background: var(--bg) url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;
+  background-size: 16px;
+  appearance: none;
+}
+ 
+/* Results/POI */
+.results{padding:10px} 
+.results-header{color:var(--muted);margin-bottom:6px; font-weight: 600;} 
+.results-body{
+  max-height:220px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  white-space:pre-wrap;
+  padding: 6px 0;
+} 
+ 
+.poi-filters{display:flex;gap:12px;align-items:center;margin:6px 0 8px; flex-wrap: wrap;} 
+.checkbox-label{
+  display:flex;
+  gap:4px;
+  align-items:center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--bg);
+  cursor: pointer;
+} 
+.poi-filters input[type="checkbox"]{
+  accent-color: var(--primary);
+}
+
+/* スポット詳細 */
+#poi-detail{
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive */ 
+@media (max-width: 1024px){ 
+  .layout{grid-template-columns:1fr;} 
+  .map{height: 400px;} 
+  #history-panel{left:0} 
+}
+@media (max-width: 500px){
+  .top-bar{flex-direction: column;}
+  .btn-group-left{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .panel{
+    width: 95%;
+    left: 2.5%;
+    top: 64px;
+  }
+  #history-panel{
+    left: 2.5%;
+  }
+}

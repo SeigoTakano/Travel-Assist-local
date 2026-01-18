@@ -1,0 +1,119 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #f5f7fa;
+    color: #333;
+}
+
+/* header */
+.header {
+    background: var(--brand, #0b78b9);
+    color: #fff;
+    text-align: center;
+    padding: 28px 0 16px;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+/* タブ共通デザイン */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.tab {
+  color: #d5edfb;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.tab:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.tab.active {
+  background: #fff;
+  color: #0b78b9;
+  font-weight: 700;
+}
+
+/* main container */
+.container {
+    width: 60%;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+}
+
+.profile-section h2 {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 12px;
+    margin-bottom: 25px;
+}
+
+/* profile items layout */
+.form-group {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.form-label {
+    width: 130px; /* ラベル揃え */
+    font-weight: bold;
+}
+
+.form-value {
+    flex: none;
+    width: 540px;
+    height: 15px;
+    background: #eee;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 15px;
+    margin-right: 12px;
+}
+
+/* buttons */
+.btn-primary {
+    display: inline-block;
+    background: #0083ca;
+    padding: 8px 14px;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-primary:hover {
+    background: #006ba6;
+}
+
+/* password button */
+.btn-password {
+    display: block;
+    background: #0083ca;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin: 30px 0 0 auto;
+    width: fit-content;
+}
+
+.btn-password:hover {
+    background: #006ba6;
+}

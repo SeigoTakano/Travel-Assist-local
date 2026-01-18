@@ -1,0 +1,80 @@
+/* --- 基本設定 --- */
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #f3f4f6;
+    /* ヘッダー(60px) + 余裕(20px) = 80px 確実に空ける */
+    padding-top: 80px !important; 
+    padding-bottom: 50px;
+}
+
+/* --- ヘッダー・メニュー --- */
+.top-header {
+    width: 100%;
+    height: 60px;
+    background: #f8f9fa;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.hamburger {
+    position: fixed;
+    top: 75px; 
+    left: 20px;
+    /* 修正：最前面へ引き出す */
+    z-index: 9999 !important; 
+    width: 45px;
+    height: 45px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    /* 修正：クリック判定を保証 */
+    pointer-events: auto !important; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.hamburger span { 
+    width: 20px; 
+    height: 2px; 
+    background: white; 
+    transition: 0.3s; 
+    pointer-events: none; /* 中の線がクリックを邪魔しないように */
+}
+
+/* サイドメニュー */
+.side-menu {
+    position: fixed;
+    top: 60px;
+    left: -260px;
+    width: 240px;
+    height: calc(100% - 60px);
+    background: #3b82f6;
+    transition: 0.3s;
+    /* 修正：ヘッダーより上でボタンより下 */
+    z-index: 9000 !important; 
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+.side-menu.open { left: 0; }
+.side-menu a { 
+    display: block; 
+    color: white; 
+    text-decoration: none; 
+    padding: 15px; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
+}
+

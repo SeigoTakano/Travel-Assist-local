@@ -1,0 +1,101 @@
+@charset "UTF-8";
+
+body {
+    font-family: "メイリオ", sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* 画面中央の白い囲み */
+.container {
+    background-color: #ffffff;
+    padding: 40px 50px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 420px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* 入力エリア */
+.form-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+/* 入力欄 */
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* 現在のユーザー名（編集不可） */
+input[readonly] {
+    background-color: #f0f0f0;
+    color: #555;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* 注意文 */
+.note {
+    font-size: 13px;
+    color: #e60000;
+    text-align: left;
+    margin-top: 6px;
+    line-height: 1.3;
+}
+
+/* ボタンエリア */
+.button-area {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 共通ボタン */
+.btn {
+    width: 48%;
+    padding: 10px 0;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+/* 戻る */
+.btn.cancel {
+    background-color: #cccccc;
+    color: #333;
+}
+
+/* 変更 */
+.btn.save {
+    background-color: #139cce;
+    color: #ffffff;
+}
+
+/* ホバー時 */
+.btn:hover {
+    opacity: 0.85;
+}
+

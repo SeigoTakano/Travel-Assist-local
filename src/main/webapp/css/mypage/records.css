@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #f5f7fa;
+    color: #333;
+}
+
+/* header */
+.header {
+    background: var(--brand, #0b78b9);
+    color: #fff;
+    text-align: center;
+    padding: 28px 0 16px;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+/* タブ共通デザイン */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.tab {
+  color: #d5edfb;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.tab:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.tab.active {
+  background: #fff;
+  color: #0b78b9;
+  font-weight: 700;
+}
