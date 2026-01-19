@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import DBConnection.DBConnection;
-// Route情報を入れるためのBean/Modelクラス（後述）
 import bean.Route; 
 
 public class RouteDao {
