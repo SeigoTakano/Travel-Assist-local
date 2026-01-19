@@ -2,7 +2,7 @@
   Leaflet + OSM stack (no API key)
   - Geocoding: Nominatim
   - Routing: OSRM demo server
-  - Favorites/History: localStorage
+  - Favorites/History: localStorage + Database (via Servlet)
 */
 
 let map;
@@ -116,15 +116,35 @@ function initLeaflet(){
   els.modeSight?.addEventListener('change', onModeChange);
   els.placeSearch?.addEventListener('click', onPlaceSearch);
   els.transportMode?.addEventListener('change', ()=>{
-    // re-run routing if possible
     const origin = els.origin.value.trim();
     const destination = els.destination.value.trim();
     if(origin && destination){ onSearch(); }
   });
   els.addFavInline?.addEventListener('click', addCurrentToFavorites);
 
-  // set initial visibility according to current mode
   onModeChange();
+}
+
+// ------------------------------------------------------------------
+// ★ 追加：サーバー（Java）のDBへデータを送る関数
+// ------------------------------------------------------------------
+function saveToDatabase(start, end, polyline, isFavorite) {
+  const params = new URLSearchParams();
+  params.append('start', start);
+  params.append('end', end);
+  params.append('polyline', JSON.stringify(polyline));
+  params.append('isFavorite', isFavorite);
+
+  fetch('../saveRoute', { // ServletのURLに合わせて調整
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  })
+  .then(response => {
+    if (!response.ok) throw new Error('DB保存に失敗しました');
+    console.log('DB保存成功！');
+  })
+  .catch(error => console.error('Error:', error));
 }
 
 function togglePanel(which){
@@ -173,7 +193,12 @@ async function onSearch(){
     ].join('\n');
     showSummary(text);
 
+    // ローカルストレージに保存
     pushHistory({ origin, destination, when: Date.now() });
+
+    // ★ サーバーのDBに「履歴(isFavorite=false)」として保存
+    saveToDatabase(origin, destination, lastRouteCoords, false);
+
   }catch(err){
     console.error(err);
     showSummary('経路を取得できませんでした。ネットワーク状況をご確認ください。');
@@ -254,7 +279,6 @@ function currentProfile(){
 }
 
 async function routeOsrm(o, d){
-  // OSRM expects lon,lat order
   const profile = currentProfile();
   const url = new URL(`https://router.project-osrm.org/route/v1/${profile}/${o.lng},${o.lat};${d.lng},${d.lat}`);
   url.searchParams.set('overview','full');
@@ -267,14 +291,12 @@ async function routeOsrm(o, d){
 }
 
 function drawRoute(coords){
-  // coords is [[lon,lat], ...]
   const latlngs = coords.map(([lon,lat]) => [lat,lon]);
   if(routeLayer){
     map.removeLayer(routeLayer);
   }
   routeLayer = L.polyline(latlngs, { color: '#2563eb', weight: 5, opacity: 0.85 }).addTo(map);
   map.fitBounds(routeLayer.getBounds(), { padding: [30,30] });
-  // clear poi markers on new route
   clearPoiMarkers();
   allPois = [];
   if(els.poiList) els.poiList.innerHTML = '';
@@ -290,7 +312,6 @@ function setDraggableMarkers(o, d){
       const addr = await reverseGeocode({ lat: pos.lat, lng: pos.lng });
       if(label==='出発'){ els.origin.value = addr || `${pos.lat.toFixed(5)},${pos.lng.toFixed(5)}`; }
       if(label==='到着'){ els.destination.value = addr || `${pos.lat.toFixed(5)},${pos.lng.toFixed(5)}`; }
-      // recompute route from dragged positions
       const oPos = originMarker.getLatLng();
       const dPos = destMarker.getLatLng();
       const route = await routeOsrm({lat:oPos.lat,lng:oPos.lng}, {lat:dPos.lat,lng:dPos.lng});
@@ -321,7 +342,6 @@ function geolocate(){
     const addr = await reverseGeocode(o);
     els.origin.value = addr || `${latitude.toFixed(5)},${longitude.toFixed(5)}`;
 
-    // if destination exists, recompute route
     let d = null;
     if(destMarker){
       const p = destMarker.getLatLng();
@@ -345,9 +365,8 @@ function geolocate(){
 
 async function loadPoisAlongRoute(){
   if(!lastRouteCoords || !routeLayer) return;
-  // Use map bounds around the route with small padding
   const b = routeLayer.getBounds();
-  const pad = 0.02; // ~2km padding
+  const pad = 0.02; 
   const south = b.getSouth() - pad;
   const west = b.getWest() - pad;
   const north = b.getNorth() + pad;
@@ -364,11 +383,6 @@ async function loadPoisAlongRoute(){
 }
 
 async function overpassFetch(bbox){
-  // Fetch POIs as nodes + ways + relations (with centers) to catch buildings and areas
-  // Categories:
-  //  - 観光: tourism=*, historic=*, leisure=park
-  //  - 食事: amenity=restaurant|cafe|fast_food|food_court, shop=supermarket|convenience
-  //  - SA/PA: highway=services|rest_area, amenity=fuel|charging_station
   const {south, west, north, east} = bbox;
   const q = `
     [out:json][timeout:25];
@@ -429,17 +443,13 @@ async function overpassFetch(bbox){
 function renderPois(){
   if(!els.poiList) return;
   clearPoiMarkers();
-
   const filters = {
     sight: !!els.poiSight?.checked,
     food: !!els.poiFood?.checked,
     service: !!els.poiService?.checked
   };
-
-  const route = lastRouteCoords; // [[lat,lng]]
+  const route = lastRouteCoords;
   if(!route) return;
-
-  // Filter by category and distance to route within ~1000m
   const withinM = 1000;
   const filtered = allPois.filter(p=>{
     const cat = poiCategory(p.tags);
@@ -449,20 +459,17 @@ function renderPois(){
     const d = distancePointToPolylineMeters([p.lat,p.lng], route);
     return d <= withinM;
   });
-
   if(filtered.length===0){
-    els.poiList.textContent = '該当スポットはありません。フィルタや検索条件を見直してください。';
+    els.poiList.textContent = '該当スポットはありません。';
     return;
   }
   els.poiList.innerHTML = '';
-
   filtered.slice(0,300).forEach(p=>{
     const marker = L.marker([p.lat,p.lng]);
     marker.bindPopup(`${escapeHtml(p.name)}`);
     marker._poi = p;
     marker.on('click', ()=>{ showPoiDetail(p); });
     cluster.addLayer(marker);
-
     const item = document.createElement('div');
     item.className = 'poi-item';
     const cat = poiCategory(p.tags);
@@ -521,7 +528,7 @@ async function onPlaceSearch(){
     const results = await placeSearchNominatim(q);
     if(!results.length){
       els.poiDetail.classList.remove('muted');
-      els.poiDetail.textContent = '観光地が見つかりませんでした。キーワードを見直してください。';
+      els.poiDetail.textContent = '観光地が見つかりませんでした。';
       return;
     }
     const r = results[0];
@@ -534,7 +541,6 @@ async function onPlaceSearch(){
   }
 }
 
-// Distance utilities
 function distancePointToPolylineMeters(pointLatLng, polylineLatLngs){
   let min = Infinity;
   for(let i=0;i<polylineLatLngs.length-1;i++){
@@ -547,7 +553,6 @@ function distancePointToPolylineMeters(pointLatLng, polylineLatLngs){
 }
 
 function distancePointToSegmentMeters(p, a, b){
-  // Equirectangular approximation
   const latRad = Math.PI/180;
   const x = (lng)=> lng * Math.cos(((a[0]+b[0])/2) * latRad);
   const ax = x(a[1]), ay = a[0];
@@ -625,6 +630,9 @@ function addCurrentToFavorites(){
   STORE.favorites.push({ origin, destination, saved: Date.now() });
   saveStore(STORE.favoritesKey, STORE.favorites);
   renderFavorites();
+
+  // ★ サーバーのDBに「お気に入り(isFavorite=true)」として保存
+  saveToDatabase(origin, destination, lastRouteCoords, true);
 }
 
 function renderFavorites(){
