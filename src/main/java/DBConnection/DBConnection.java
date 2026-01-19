@@ -7,16 +7,22 @@ import java.sql.SQLException;
 public class DBConnection {
 
     private static final String URL =
-            "jdbc:mysql://localhost:3306/TravelAssist?useSSL=false&serverTimezone=Asia/Tokyo";
+            "jdbc:mysql://localhost:3306/travelassist?useSSL=false&serverTimezone=Asia/Tokyo";
     private static final String USER = "root";
     private static final String PASSWORD = "travelassist";
 
-    // 接続用のメソッド
     public static Connection getConnection() throws SQLException {
+        try {
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new SQLException("MySQLドライバー（JAR）がプロジェクトに入っていません。");
+        }
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    // ★これが必要です！プログラムを実行するためのメインメソッド
+    // 接続テスト用メインメソッド
     public static void main(String[] args) {
         try (Connection conn = getConnection()) {
             if (conn != null) {

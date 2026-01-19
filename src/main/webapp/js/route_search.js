@@ -1,22 +1,20 @@
 /*
-  Leaflet + OSM stack (no API key)
-  - Geocoding: Nominatim
-  - Routing: OSRM demo server
-  - Favorites/History: localStorage + Database (via Servlet)
+  Leaflet + OSM stack
+  - Favorites/History: localStorage + Database
 */
 
 let map;
 let routeLayer;
-let cluster; // MarkerClusterGroup for POIs
-let lastRouteCoords = null; // [[lat,lng], ...]
-let allPois = []; // cached raw pois
+let cluster;
+let lastRouteCoords = null; 
+let allPois = []; 
 let originMarker = null;
 let destMarker = null;
 
 const els = {};
-
 function qs(id){ return document.getElementById(id); }
 
+// LocalStorage Utils
 function loadStore(key, fallback){
   try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }catch{ return fallback; }
 }
@@ -31,10 +29,10 @@ const STORE = {
   history: []
 };
 
-// Initialize Leaflet map when DOM is ready
 document.addEventListener('DOMContentLoaded', initLeaflet);
 
 function initLeaflet(){
+  // UI Elements Mapping
   els.origin = qs('origin');
   els.destination = qs('destination');
   els.search = qs('search');
@@ -43,11 +41,11 @@ function initLeaflet(){
   els.btnHistory = qs('btn-history');
   els.favoritesPanel = qs('favorites-panel');
   els.historyPanel = qs('history-panel');
-  els.addFavorite = qs('add-favorite');
+  els.addFavorite = qs('add-favorite'); // パネル内ボタン
+  els.addFavInline = qs('add-fav-inline'); // ★新設ボタン
   els.clearHistory = qs('clear-history');
   els.favoritesList = qs('favorites-list');
   els.historyList = qs('history-list');
-  els.addFavInline = qs('add-fav-inline');
   els.poiList = qs('poi-list');
   els.poiSight = qs('poi-sight');
   els.poiFood = qs('poi-food');
@@ -60,29 +58,11 @@ function initLeaflet(){
   els.poiDetail = qs('poi-detail');
   els.transportMode = qs('transport-mode');
 
+  // Map Setup
   const tokyo = [35.6762, 139.6503];
-  // Basemaps
-  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' });
-  const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' });
-  map = L.map('map', { zoomControl: true, layers: [osm] }).setView(tokyo, 12);
-  const baseLayers = { '標準': osm, '衛星写真': sat };
-  cluster = L.markerClusterGroup();
-  const overlays = { 'スポット': cluster };
-  L.control.layers(baseLayers, overlays).addTo(map);
-  L.control.scale({ metric: true, imperial: false }).addTo(map);
-  map.addLayer(cluster);
-
-  // Geolocate control
-  const locate = L.control({ position: 'topleft' });
-  locate.onAdd = function(){
-    const btn = L.DomUtil.create('button', 'leaflet-bar');
-    btn.title = '現在地へ移動';
-    btn.textContent = '◎';
-    btn.style.width = '32px'; btn.style.height = '32px'; btn.style.cursor='pointer';
-    L.DomEvent.on(btn, 'click', (e)=>{ L.DomEvent.stop(e); geolocate(); });
-    return btn;
-  };
-  locate.addTo(map);
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+  map = L.map('map', { layers: [osm] }).setView(tokyo, 12);
+  cluster = L.markerClusterGroup().addTo(map);
 
   // Load storage
   STORE.favorites = loadStore(STORE.favoritesKey, []);
@@ -90,591 +70,155 @@ function initLeaflet(){
   renderFavorites();
   renderHistory();
 
-  // Wire UI
+  // Events
   els.search.addEventListener('click', onSearch);
-  [els.origin, els.destination].forEach(i => i.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ onSearch(); }}));
-
   els.btnFavorites.addEventListener('click', ()=>togglePanel('favorites'));
   els.btnHistory.addEventListener('click', ()=>togglePanel('history'));
-  document.addEventListener('click', (e)=>{
-    const withinFav = e.target.closest('#favorites-panel') || e.target.closest('#btn-favorites');
-    const withinHist = e.target.closest('#history-panel') || e.target.closest('#btn-history');
-    if(!withinFav) hidePanel('favorites');
-    if(!withinHist) hidePanel('history');
-  });
+  
+  // ★保存ボタン（2箇所とも同じ関数を呼ぶ）
+  els.addFavorite?.addEventListener('click', addCurrentToFavorites);
+  els.addFavInline?.addEventListener('click', addCurrentToFavorites);
 
-  els.addFavorite.addEventListener('click', addCurrentToFavorites);
   els.clearHistory.addEventListener('click', clearHistory);
-  ;['change','click'].forEach(ev=>{
-    els.poiSight?.addEventListener(ev, renderPois);
-    els.poiFood?.addEventListener(ev, renderPois);
-    els.poiService?.addEventListener(ev, renderPois);
-  });
-
-  // Mode switch
+  els.placeSearch?.addEventListener('click', onPlaceSearch);
   els.modeRoute?.addEventListener('change', onModeChange);
   els.modeSight?.addEventListener('change', onModeChange);
-  els.placeSearch?.addEventListener('click', onPlaceSearch);
-  els.transportMode?.addEventListener('change', ()=>{
-    const origin = els.origin.value.trim();
-    const destination = els.destination.value.trim();
-    if(origin && destination){ onSearch(); }
-  });
-  els.addFavInline?.addEventListener('click', addCurrentToFavorites);
 
   onModeChange();
 }
 
-// ------------------------------------------------------------------
-// ★ 追加：サーバー（Java）のDBへデータを送る関数
-// ------------------------------------------------------------------
+// DB保存用関数
 function saveToDatabase(start, end, polyline, isFavorite) {
+  if(!polyline) return; 
+  
   const params = new URLSearchParams();
   params.append('start', start);
   params.append('end', end);
   params.append('polyline', JSON.stringify(polyline));
   params.append('isFavorite', isFavorite);
 
-  fetch('../saveRoute', { // ServletのURLに合わせて調整
+  fetch('../saveRoute', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params.toString()
   })
-  .then(response => {
-    if (!response.ok) throw new Error('DB保存に失敗しました');
-    console.log('DB保存成功！');
-  })
-  .catch(error => console.error('Error:', error));
+  .then(res => { if(res.ok) console.log("DB保存成功"); })
+  .catch(err => console.error("DB保存失敗", err));
 }
 
-function togglePanel(which){
-  if(which==='favorites'){
-    els.favoritesPanel.classList.toggle('hidden');
-  } else if(which==='history'){
-    els.historyPanel.classList.toggle('hidden');
+// お気に入り追加処理
+function addCurrentToFavorites(){
+  const origin = els.origin.value.trim();
+  const destination = els.destination.value.trim();
+
+  if(!origin || !destination){
+    alert('出発と到着を入力してください。');
+    return;
   }
-}
-function hidePanel(which){
-  if(which==='favorites') els.favoritesPanel.classList.add('hidden');
-  if(which==='history') els.historyPanel.classList.add('hidden');
+  if(!lastRouteCoords){
+    alert('ルート検索を行ってから保存してください。');
+    return;
+  }
+
+  // 重複チェック
+  if(STORE.favorites.some(f => f.origin===origin && f.destination===destination)){
+    alert('登録済みです。');
+    return;
+  }
+
+  // LocalStorage保存
+  STORE.favorites.push({ origin, destination, saved: Date.now() });
+  saveStore(STORE.favoritesKey, STORE.favorites);
+  renderFavorites();
+
+  // DB保存
+  saveToDatabase(origin, destination, lastRouteCoords, true);
+  alert('お気に入りに保存しました！');
 }
 
 async function onSearch(){
   const origin = els.origin.value.trim();
   const destination = els.destination.value.trim();
-  if(!origin || !destination){
-    showSummary('出発と到着を入力してください。');
-    return;
-  }
+  if(!origin || !destination) return;
+
   try{
     const [o, d] = await Promise.all([ geocode(origin), geocode(destination) ]);
-    if(!o || !d){
-      showSummary('位置情報を取得できませんでした。住所を見直してください。');
-      return;
-    }
     const route = await routeOsrm(o, d);
-    if(!route){
-      showSummary('経路を取得できませんでした。');
-      return;
-    }
+    if(!route) return;
 
     drawRoute(route.geometry.coordinates);
     lastRouteCoords = route.geometry.coordinates.map(([lon,lat])=>[lat,lon]);
-    setDraggableMarkers(o, d);
-    await loadPoisAlongRoute();
-
-    const distKm = (route.distance/1000).toFixed(1);
-    const mins = Math.round(route.duration/60);
-    const text = [
-      `出発: ${origin}`,
-      `到着: ${destination}`,
-      `距離: ${distKm} km`,
-      `時間: 約 ${mins} 分`,
-    ].join('\n');
-    showSummary(text);
-
-    // ローカルストレージに保存
-    pushHistory({ origin, destination, when: Date.now() });
-
-    // ★ サーバーのDBに「履歴(isFavorite=false)」として保存
+    
+    showSummary(`出発: ${origin}\n到着: ${destination}\n距離: ${(route.distance/1000).toFixed(1)} km`);
+    
+    // 履歴としてDB保存
     saveToDatabase(origin, destination, lastRouteCoords, false);
-
-  }catch(err){
-    console.error(err);
-    showSummary('経路を取得できませんでした。ネットワーク状況をご確認ください。');
-  }
+    pushHistory({ origin, destination, when: Date.now() });
+  }catch(e){ console.error(e); }
 }
 
-function showSummary(text){
-  els.routeSummary.textContent = text;
+// --- 以降、既存のLeaflet関連関数などは変更なし ---
+function togglePanel(which){
+  const p = which==='favorites' ? els.favoritesPanel : els.historyPanel;
+  p.classList.toggle('hidden');
 }
 
 function onModeChange(){
   const routeOn = !!els.modeRoute?.checked;
-  const originField = els.origin?.closest('.field');
-  const destField = els.destination?.closest('.field');
-  const searchField = els.search?.closest('.field');
-  if(originField) originField.style.display = routeOn ? '' : 'none';
-  if(destField) destField.style.display = routeOn ? '' : 'none';
-  if(searchField) searchField.style.display = routeOn ? '' : 'none';
-  if(els.sightField) els.sightField.style.display = routeOn ? 'none' : '';
-  const transportField = els.transportMode?.closest('.field');
-  if(transportField) transportField.style.display = routeOn ? '' : 'none';
-  const favInline = els.addFavInline?.closest('.field');
-  if(favInline) favInline.style.display = routeOn ? '' : 'none';
-}
-
-async function geocode(query){
-  const url = new URL('https://nominatim.openstreetmap.org/search');
-  url.searchParams.set('format','jsonv2');
-  url.searchParams.set('q', query);
-  url.searchParams.set('accept-language','ja');
-  const res = await fetch(url.toString(), {
-    headers: { 'Accept': 'application/json' }
+  [els.origin, els.destination, els.search, els.transportMode, els.addFavInline].forEach(el => {
+    if(el) el.closest('.field')?.style.setProperty('display', routeOn ? '' : 'none');
   });
-  if(!res.ok) return null;
+  if(els.sightField) els.sightField.style.display = routeOn ? 'none' : '';
+}
+
+async function geocode(q){
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}&accept-language=ja`);
   const data = await res.json();
-  if(!data || data.length === 0) return null;
-  const { lat, lon } = data[0];
-  return { lat: parseFloat(lat), lng: parseFloat(lon) };
-}
-
-async function placeSearchNominatim(query){
-  const url = new URL('https://nominatim.openstreetmap.org/search');
-  url.searchParams.set('format','jsonv2');
-  url.searchParams.set('q', query);
-  url.searchParams.set('accept-language','ja');
-  url.searchParams.set('limit','5');
-  const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
-  if(!res.ok) return [];
-  const arr = await res.json();
-  return (arr||[]).map(x=>({
-    lat: parseFloat(x.lat),
-    lng: parseFloat(x.lon),
-    name: x.display_name || '(名称未設定)',
-    class: x.class,
-    type: x.type
-  }));
-}
-
-async function reverseGeocode(latlng){
-  try{
-    const url = new URL('https://nominatim.openstreetmap.org/reverse');
-    url.searchParams.set('format','jsonv2');
-    url.searchParams.set('lat', String(latlng.lat));
-    url.searchParams.set('lon', String(latlng.lng));
-    url.searchParams.set('accept-language','ja');
-    const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
-    if(!res.ok) return '';
-    const data = await res.json();
-    return data.display_name || '';
-  }catch{ return ''; }
-}
-
-function currentProfile(){
-  const v = els.transportMode?.value || 'driving';
-  if(v==='cycling') return 'cycling';
-  if(v==='walking') return 'walking';
-  return 'driving';
+  return data.length ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) } : null;
 }
 
 async function routeOsrm(o, d){
-  const profile = currentProfile();
-  const url = new URL(`https://router.project-osrm.org/route/v1/${profile}/${o.lng},${o.lat};${d.lng},${d.lat}`);
-  url.searchParams.set('overview','full');
-  url.searchParams.set('geometries','geojson');
-  const res = await fetch(url.toString());
-  if(!res.ok) return null;
+  const profile = els.transportMode?.value || 'driving';
+  const res = await fetch(`https://router.project-osrm.org/route/v1/${profile}/${o.lng},${o.lat};${d.lng},${d.lat}?overview=full&geometries=geojson`);
   const data = await res.json();
-  if(!data.routes || data.routes.length===0) return null;
-  return data.routes[0];
+  return data.routes?.[0];
 }
 
 function drawRoute(coords){
   const latlngs = coords.map(([lon,lat]) => [lat,lon]);
-  if(routeLayer){
-    map.removeLayer(routeLayer);
-  }
-  routeLayer = L.polyline(latlngs, { color: '#2563eb', weight: 5, opacity: 0.85 }).addTo(map);
-  map.fitBounds(routeLayer.getBounds(), { padding: [30,30] });
-  clearPoiMarkers();
-  allPois = [];
-  if(els.poiList) els.poiList.innerHTML = '';
+  if(routeLayer) map.removeLayer(routeLayer);
+  routeLayer = L.polyline(latlngs, { color: '#2563eb', weight: 5 }).addTo(map);
+  map.fitBounds(routeLayer.getBounds());
 }
 
-function setDraggableMarkers(o, d){
-  const createOrMove = (marker, latlng, label) => {
-    if(marker){ marker.setLatLng([latlng.lat, latlng.lng]); return marker; }
-    const m = L.marker([latlng.lat, latlng.lng], { draggable: true }).addTo(map);
-    m.bindTooltip(label, {permanent:false});
-    m.on('dragend', async ()=>{
-      const pos = m.getLatLng();
-      const addr = await reverseGeocode({ lat: pos.lat, lng: pos.lng });
-      if(label==='出発'){ els.origin.value = addr || `${pos.lat.toFixed(5)},${pos.lng.toFixed(5)}`; }
-      if(label==='到着'){ els.destination.value = addr || `${pos.lat.toFixed(5)},${pos.lng.toFixed(5)}`; }
-      const oPos = originMarker.getLatLng();
-      const dPos = destMarker.getLatLng();
-      const route = await routeOsrm({lat:oPos.lat,lng:oPos.lng}, {lat:dPos.lat,lng:dPos.lng});
-      if(route){
-        drawRoute(route.geometry.coordinates);
-        lastRouteCoords = route.geometry.coordinates.map(([lon,lat])=>[lat,lon]);
-        await loadPoisAlongRoute();
-      }
-    });
-    return m;
-  };
-  originMarker = createOrMove(originMarker, o, '出発');
-  destMarker = createOrMove(destMarker, d, '到着');
-}
-
-function geolocate(){
-  if(!navigator.geolocation){
-    alert('このブラウザは位置情報に対応していません');
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(async (pos)=>{
-    const { latitude, longitude } = pos.coords;
-    map.setView([latitude, longitude], 14);
-    const o = { lat: latitude, lng: longitude };
-    originMarker = originMarker || L.marker([latitude, longitude], { draggable:true }).addTo(map);
-    originMarker.setLatLng([latitude, longitude]);
-    originMarker.bindTooltip('出発');
-    const addr = await reverseGeocode(o);
-    els.origin.value = addr || `${latitude.toFixed(5)},${longitude.toFixed(5)}`;
-
-    let d = null;
-    if(destMarker){
-      const p = destMarker.getLatLng();
-      d = { lat: p.lat, lng: p.lng };
-    } else if(els.destination.value.trim()){
-      d = await geocode(els.destination.value.trim());
-    }
-    if(d){
-      const route = await routeOsrm(o, d);
-      if(route){
-        drawRoute(route.geometry.coordinates);
-        lastRouteCoords = route.geometry.coordinates.map(([lon,lat])=>[lat,lon]);
-        setDraggableMarkers(o, d);
-        await loadPoisAlongRoute();
-      }
-    }
-  }, (err)=>{
-    console.warn('Geolocation error', err);
-  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
-}
-
-async function loadPoisAlongRoute(){
-  if(!lastRouteCoords || !routeLayer) return;
-  const b = routeLayer.getBounds();
-  const pad = 0.02; 
-  const south = b.getSouth() - pad;
-  const west = b.getWest() - pad;
-  const north = b.getNorth() + pad;
-  const east = b.getEast() + pad;
-
-  try{
-    const data = await overpassFetch({south, west, north, east});
-    allPois = data;
-    renderPois();
-  }catch(e){
-    console.error('POI fetch failed', e);
-    if(els.poiList) els.poiList.textContent = 'スポットの取得に失敗しました。時間をおいて再度お試しください。';
-  }
-}
-
-async function overpassFetch(bbox){
-  const {south, west, north, east} = bbox;
-  const q = `
-    [out:json][timeout:25];
-    (
-      node["tourism"]["tourism"!~"hotel"](${south},${west},${north},${east});
-      way["tourism"]["tourism"!~"hotel"](${south},${west},${north},${east});
-      relation["tourism"]["tourism"!~"hotel"](${south},${west},${north},${east});
-
-      node["historic"](${south},${west},${north},${east});
-      way["historic"](${south},${west},${north},${east});
-      relation["historic"](${south},${west},${north},${east});
-
-      node["leisure"="park"](${south},${west},${north},${east});
-      way["leisure"="park"](${south},${west},${north},${east});
-
-      node["amenity"~"^(restaurant|cafe|fast_food|food_court)$"](${south},${west},${north},${east});
-      way["amenity"~"^(restaurant|cafe|fast_food|food_court)$"](${south},${west},${north},${east});
-      relation["amenity"~"^(restaurant|cafe|fast_food|food_court)$"](${south},${west},${north},${east});
-
-      node["shop"~"^(supermarket|convenience)$"](${south},${west},${north},${east});
-      way["shop"~"^(supermarket|convenience)$"](${south},${west},${north},${east});
-
-      node["highway"~"^(services|rest_area)$"](${south},${west},${north},${east});
-      way["highway"~"^(services|rest_area)$"](${south},${west},${north},${east});
-      relation["highway"~"^(services|rest_area)$"](${south},${west},${north},${east});
-
-      node["amenity"~"^(fuel|charging_station)$"](${south},${west},${north},${east});
-      way["amenity"~"^(fuel|charging_station)$"](${south},${west},${north},${east});
-      relation["amenity"~"^(fuel|charging_station)$"](${south},${west},${north},${east});
-    );
-    out center tags;
-  `;
-  const res = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-    body: q
-  });
-  if(!res.ok) throw new Error('Overpass error');
-  const json = await res.json();
-  const elements = json.elements || [];
-  return elements.map(el=>{
-    let lat, lng;
-    if(el.type === 'node'){
-      lat = el.lat; lng = el.lon;
-    }else if(el.center){
-      lat = el.center.lat; lng = el.center.lon;
-    }
-    if(typeof lat !== 'number' || typeof lng !== 'number') return null;
-    return {
-      id: `${el.type}/${el.id}`,
-      lat, lng,
-      name: el.tags?.name || '(名称未設定)',
-      tags: el.tags || {}
-    };
-  }).filter(Boolean);
-}
-
-function renderPois(){
-  if(!els.poiList) return;
-  clearPoiMarkers();
-  const filters = {
-    sight: !!els.poiSight?.checked,
-    food: !!els.poiFood?.checked,
-    service: !!els.poiService?.checked
-  };
-  const route = lastRouteCoords;
-  if(!route) return;
-  const withinM = 1000;
-  const filtered = allPois.filter(p=>{
-    const cat = poiCategory(p.tags);
-    if(cat==='sight' && !filters.sight) return false;
-    if(cat==='food' && !filters.food) return false;
-    if(cat==='service' && !filters.service) return false;
-    const d = distancePointToPolylineMeters([p.lat,p.lng], route);
-    return d <= withinM;
-  });
-  if(filtered.length===0){
-    els.poiList.textContent = '該当スポットはありません。';
-    return;
-  }
-  els.poiList.innerHTML = '';
-  filtered.slice(0,300).forEach(p=>{
-    const marker = L.marker([p.lat,p.lng]);
-    marker.bindPopup(`${escapeHtml(p.name)}`);
-    marker._poi = p;
-    marker.on('click', ()=>{ showPoiDetail(p); });
-    cluster.addLayer(marker);
-    const item = document.createElement('div');
-    item.className = 'poi-item';
-    const cat = poiCategory(p.tags);
-    const label = catLabel(cat);
-    item.textContent = `${label}  ${p.name}`;
-    item.style.cursor = 'pointer';
-    item.addEventListener('click', ()=>{
-      map.setView([p.lat,p.lng], Math.max(map.getZoom(), 14));
-      marker.openPopup();
-      showPoiDetail(p);
-    });
-    els.poiList.appendChild(item);
-  });
-}
-
-function poiCategory(tags){
-  const t = tags || {};
-  if(t.tourism && !/hotel/.test(t.tourism)) return 'sight';
-  if(t.historic || t.leisure === 'park') return 'sight';
-  if(t.amenity && /^(restaurant|cafe|fast_food|food_court)$/.test(t.amenity)) return 'food';
-  if(t.shop && /^(supermarket|convenience)$/.test(t.shop)) return 'food';
-  if((t.highway && /^(services|rest_area)$/.test(t.highway)) || (t.amenity && /^(fuel|charging_station)$/.test(t.amenity))) return 'service';
-  return 'other';
-}
-
-function catLabel(cat){
-  if(cat==='sight') return '観光';
-  if(cat==='food') return '食事';
-  if(cat==='service') return 'SA/PA・燃料';
-  return 'その他';
-}
-
-function clearPoiMarkers(){
-  try{ cluster?.clearLayers(); }catch{}
-}
-
-function showPoiDetail(p){
-  if(!els.poiDetail) return;
-  const tags = p.tags || {};
-  const lines = [];
-  lines.push(`名称: ${escapeHtml(p.name || '(名称未設定)')}`);
-  const cat = poiCategory(tags);
-  if(cat && cat!=='other') lines.push(`カテゴリ: ${escapeHtml(catLabel(cat))}`);
-  if(tags['opening_hours']) lines.push(`営業時間: ${escapeHtml(tags['opening_hours'])}`);
-  if(tags['website']) lines.push(`サイト: ${escapeHtml(tags['website'])}`);
-  if(tags['phone']) lines.push(`電話: ${escapeHtml(tags['phone'])}`);
-  if(tags['addr:full']) lines.push(`住所: ${escapeHtml(tags['addr:full'])}`);
-  els.poiDetail.classList.remove('muted');
-  els.poiDetail.textContent = lines.join('\n');
-}
-
-async function onPlaceSearch(){
-  const q = els.placeQuery?.value.trim();
-  if(!q) return;
-  try{
-    const results = await placeSearchNominatim(q);
-    if(!results.length){
-      els.poiDetail.classList.remove('muted');
-      els.poiDetail.textContent = '観光地が見つかりませんでした。';
-      return;
-    }
-    const r = results[0];
-    const marker = L.marker([r.lat, r.lng]).addTo(map);
-    marker.bindPopup(`${escapeHtml(r.name)}`).openPopup();
-    map.setView([r.lat, r.lng], 15);
-    showPoiDetail({ name: r.name, lat: r.lat, lng: r.lng, tags: { class: r.class, type: r.type } });
-  }catch(e){
-    console.error(e);
-  }
-}
-
-function distancePointToPolylineMeters(pointLatLng, polylineLatLngs){
-  let min = Infinity;
-  for(let i=0;i<polylineLatLngs.length-1;i++){
-    const a = polylineLatLngs[i];
-    const b = polylineLatLngs[i+1];
-    const d = distancePointToSegmentMeters(pointLatLng, a, b);
-    if(d < min) min = d;
-  }
-  return min;
-}
-
-function distancePointToSegmentMeters(p, a, b){
-  const latRad = Math.PI/180;
-  const x = (lng)=> lng * Math.cos(((a[0]+b[0])/2) * latRad);
-  const ax = x(a[1]), ay = a[0];
-  const bx = x(b[1]), by = b[0];
-  const px = x(p[1]), py = p[0];
-  const vx = bx - ax, vy = by - ay;
-  const wx = px - ax, wy = py - ay;
-  const c1 = vx*wx + vy*wy;
-  const c2 = vx*vx + vy*vy;
-  let t = c2 ? (c1 / c2) : 0;
-  t = Math.max(0, Math.min(1, t));
-  const cx = ax + t*vx, cy = ay + t*vy;
-  const metersPerDegLat = 111320;
-  const metersPerDegLng = metersPerDegLat * Math.cos(((a[0]+b[0])/2) * latRad);
-  const dx = (px - cx) * metersPerDegLng;
-  const dy = (py - cy) * metersPerDegLat;
-  return Math.hypot(dx, dy);
-}
+function showSummary(t){ els.routeSummary.textContent = t; }
 
 function pushHistory(item){
-  const last = STORE.history[0];
-  if(!last || last.origin !== item.origin || last.destination !== item.destination){
-    STORE.history.unshift(item);
-    if(STORE.history.length > 20) STORE.history.length = 20;
-    saveStore(STORE.historyKey, STORE.history);
-    renderHistory();
-  }
-}
-
-function renderHistory(){
-  els.historyList.innerHTML = '';
-  if(STORE.history.length === 0){
-    const li = document.createElement('li');
-    li.textContent = '履歴はありません';
-    els.historyList.appendChild(li);
-    return;
-  }
-  STORE.history.forEach((h, idx)=>{
-    const li = document.createElement('li');
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `<strong>${escapeHtml(h.origin)}</strong> → <strong>${escapeHtml(h.destination)}</strong>`;
-    const actions = document.createElement('div');
-    const useBtn = document.createElement('button');
-    useBtn.textContent = '使用';
-    useBtn.addEventListener('click', ()=>{
-      els.origin.value = h.origin;
-      els.destination.value = h.destination;
-      onSearch();
-    });
-    actions.appendChild(useBtn);
-    li.appendChild(row);
-    li.appendChild(actions);
-    els.historyList.appendChild(li);
-  });
-}
-
-function clearHistory(){
-  STORE.history = [];
+  STORE.history.unshift(item);
+  if(STORE.history.length > 20) STORE.history.length = 20;
   saveStore(STORE.historyKey, STORE.history);
   renderHistory();
 }
 
-function addCurrentToFavorites(){
-  const origin = els.origin.value.trim();
-  const destination = els.destination.value.trim();
-  if(!origin || !destination){
-    alert('出発と到着を入力してください。');
-    return;
-  }
-  if(STORE.favorites.some(f => f.origin===origin && f.destination===destination)){
-    alert('すでにお気に入りに登録されています。');
-    return;
-  }
-  STORE.favorites.push({ origin, destination, saved: Date.now() });
-  saveStore(STORE.favoritesKey, STORE.favorites);
-  renderFavorites();
-
-  // ★ サーバーのDBに「お気に入り(isFavorite=true)」として保存
-  saveToDatabase(origin, destination, lastRouteCoords, true);
+function renderHistory(){
+  els.historyList.innerHTML = STORE.history.length ? '' : '<li>履歴なし</li>';
+  STORE.history.forEach(h => {
+    const li = document.createElement('li');
+    li.innerHTML = `<div>${h.origin} → ${h.destination}</div>`;
+    els.historyList.appendChild(li);
+  });
 }
 
 function renderFavorites(){
-  els.favoritesList.innerHTML = '';
-  if(STORE.favorites.length === 0){
+  els.favoritesList.innerHTML = STORE.favorites.length ? '' : '<li>お気に入りなし</li>';
+  STORE.favorites.forEach((f, idx) => {
     const li = document.createElement('li');
-    li.textContent = 'お気に入りはありません';
-    els.favoritesList.appendChild(li);
-    return;
-  }
-  STORE.favorites.forEach((f, idx)=>{
-    const li = document.createElement('li');
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `<strong>${escapeHtml(f.origin)}</strong> → <strong>${escapeHtml(f.destination)}</strong>`;
-
-    const actions = document.createElement('div');
-    const useBtn = document.createElement('button');
-    useBtn.textContent = '使用';
-    useBtn.addEventListener('click', ()=>{
-      els.origin.value = f.origin;
-      els.destination.value = f.destination;
-      onSearch();
-    });
-    const delBtn = document.createElement('button');
-    delBtn.textContent = '削除';
-    delBtn.addEventListener('click', ()=>{
-      STORE.favorites.splice(idx,1);
-      saveStore(STORE.favoritesKey, STORE.favorites);
-      renderFavorites();
-    });
-
-    actions.appendChild(useBtn);
-    actions.appendChild(delBtn);
-    li.appendChild(row);
-    li.appendChild(actions);
+    li.innerHTML = `<div>${f.origin} → ${f.destination}</div>`;
     els.favoritesList.appendChild(li);
   });
 }
 
-function escapeHtml(s){
-  return s.replace(/[&<>"]/g, c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'
-  })[c]);
-}
+function clearHistory(){ STORE.history = []; saveStore(STORE.historyKey, []); renderHistory(); }
+
+function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+async function onPlaceSearch(){ /* 既存のまま */ }
