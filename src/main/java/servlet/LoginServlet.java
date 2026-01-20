@@ -12,27 +12,27 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        request.setCharacterEncoding("UTF-8");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         
-        // DAOで詳細情報を取得するように改造しても良いですが、まずは基本形
-         LoginDao dao = new LoginDao();
-        boolean isSuccess = dao.loginCheck(email, password);
-        
-        if (isSuccess) {
+        LoginDao dao = new LoginDao();
+        String username = dao.getUsernameByLogin(email, password);
+
+        if (username != null) {
             HttpSession session = request.getSession();
-            // セッションにログイン情報を格納
-            session.setAttribute("isLoggedIn", true);
-            session.setAttribute("userEmail", email);
-            
-            response.sendRedirect("welcome.jsp");
+            session.setAttribute("username", username);
+            // menu.jspはwebapp直下にある場合はこのままでOK
+            response.sendRedirect("menu.jsp"); 
         } else {
-            // 失敗時はログイン画面へ戻る
             request.setAttribute("error", "メールアドレス、またはパスワードが正しくありません。");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            // 修正箇所：フォルダ名を含める
+            request.getRequestDispatcher("login/login.jsp").forward(request, response);
         }
     }
 }

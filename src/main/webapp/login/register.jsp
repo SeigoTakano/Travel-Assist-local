@@ -45,7 +45,7 @@
         <button class="w-100 btn btn-lg btn-primary" type="submit">登録</button>
 
         <div class="mt-3">
-          <a href="login.jsp">ログイン画面に戻る</a>
+          <a href="${pageContext.request.contextPath}/login/login.jsp">ログイン画面に戻る</a>
         </div>
       </form>
     </main>
