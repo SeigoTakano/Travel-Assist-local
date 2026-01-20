@@ -36,7 +36,7 @@ public class RouteDao {
             
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("【SQLエラー】保存に失敗したぜ: " + e.getMessage());
+            System.err.println("【SQLエラー】保存に失敗: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

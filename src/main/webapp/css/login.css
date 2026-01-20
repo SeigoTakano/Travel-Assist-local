@@ -1,0 +1,94 @@
+html,
+body {
+  height: 100%;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 1rem;
+  margin: auto;
+}
+
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-signin input[type="email"] {html,
+body {
+  height: 100%;
+}
+
+body {
+  /* 追加：Flexboxを使って上下左右中央に配置 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 背景色を少し明るいグレーにすると今風になります（お好みで） */
+  background-color: #f8f9fa;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 1rem;
+  /* margin: auto; は不要になりますが、残しておいても問題ありません */
+}
+
+/* --- 以下、既存のスタイル --- */
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.link-group a {
+  font-size: 0.85rem; /* 少し小さくするとバランスが良いです */
+  color: #0d6efd;
+  transition: color 0.2s ease;
+}
+
+.link-group a:hover {
+  text-decoration: underline;
+  color: #0a58ca;
+}
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* ✅ 新規登録・パスワード忘れ 横並び調整 */
+.link-group a {
+  color: #0d6efd;
+  transition: color 0.2s ease;
+}
+
+.link-group a:hover {
+  text-decoration: underline;
+  color: #0a58ca;
+}
+
+/* ✅ ログインボタン */
+.form-signin .btn-primary {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.form-floating { margin-bottom: 15px; }
+
+.error-message { color: red; font-size: 0.9em; margin-top: -8px; margin-bottom: 10px; }
