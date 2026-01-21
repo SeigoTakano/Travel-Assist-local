@@ -30,7 +30,7 @@ public class UserNameChangeServlet extends HttpServlet {
 
         if (newUsername == null || !newUsername.matches("[A-Za-z0-9_]+")) {
             request.setAttribute("error", "ユーザーネームは英数字とアンダースコアのみです。");
-            request.getRequestDispatcher("username.jsp").forward(request, response);
+            request.getRequestDispatcher("/mypage/change/username.jsp").forward(request, response);
             return;
         }
 
@@ -45,7 +45,7 @@ public class UserNameChangeServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/profile");
         } else {
             request.setAttribute("error", "ユーザーネームの更新に失敗しました。");
-            request.getRequestDispatcher("username.jsp").forward(request, response);
+            request.getRequestDispatcher("/mypage/change/username.jsp").forward(request, response);
         }
     }
 }
