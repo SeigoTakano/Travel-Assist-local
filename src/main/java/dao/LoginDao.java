@@ -87,4 +87,25 @@ public class LoginDao {
         }
         return false;
     }
+    
+    public boolean updatePassword(String email, String newPassword) {
+        // テーブル定義に合わせて update_date と update_user を使用
+        String sql = "UPDATE users SET password = ?, update_date = CURRENT_TIMESTAMP, update_user = ? WHERE email = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, "SYSTEM_RESET"); // 更新者として適当な名前を入れる
+            pstmt.setString(3, email);
+
+            int rowsUpdated = pstmt.executeUpdate();
+            return rowsUpdated > 0;
+
+        } catch (Exception e) {
+            System.err.println("【SQLエラー】パスワード更新に失敗しました。");
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
