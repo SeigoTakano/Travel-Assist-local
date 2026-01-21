@@ -2,6 +2,7 @@ package servlet;
 
 import java.io.IOException;
 
+import dao.UserDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,8 +19,13 @@ public class UserNameChangeServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession();
-        String currentUsername = request.getParameter("currentUsername");
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect(request.getContextPath() + "/login/login.jsp");
+            return;
+        }
+
+        String currentUsername = (String) session.getAttribute("username");
         String newUsername = request.getParameter("newUsername");
 
         if (newUsername == null || !newUsername.matches("[A-Za-z0-9_]+")) {
@@ -28,11 +34,18 @@ public class UserNameChangeServlet extends HttpServlet {
             return;
         }
 
-        // TODO: データベース更新処理
-        // UserDao.updateUsername(userId, newUsername);
+        // DB更新処理
+        UserDao dao = new UserDao();
+        boolean updated = dao.updateUsername(currentUsername, newUsername);
 
-        session.setAttribute("username", newUsername);
-
-        response.sendRedirect("profile.jsp");
+        if (updated) {
+            // Session の username も更新
+            session.setAttribute("username", newUsername);
+            // 更新後は profile.jsp にリダイレクト
+            response.sendRedirect(request.getContextPath() + "/profile");
+        } else {
+            request.setAttribute("error", "ユーザーネームの更新に失敗しました。");
+            request.getRequestDispatcher("username.jsp").forward(request, response);
+        }
     }
 }

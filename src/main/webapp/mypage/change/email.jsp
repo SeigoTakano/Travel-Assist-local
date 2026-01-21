@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="container">
-    <form action="EmailChangeServlet" method="post">
+    <form action="<%= request.getContextPath() %>/EmailChangeServlet" method="post">
     
         <h1>メールアドレスを変更</h1>
 

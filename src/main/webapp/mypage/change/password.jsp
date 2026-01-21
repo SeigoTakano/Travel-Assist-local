@@ -6,17 +6,17 @@
 <head>
     <meta charset="UTF-8">
     <title>パスワード変更</title>
-    <link rel="stylesheet" href="../../css/mypage/change/password.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/mypage/change/password.css">
 </head>
 <body>
     <div class="container">
-    <form action="PasswordChangeServlet" method="post">
+    <form action="<%= request.getContextPath() %>/PasswordChangeServlet" method="post">
     
         <h1>パスワードを変更</h1>
         
         <label>現在のパスワード</label>
         <div class="password-wrapper">
-            <input type="password" id="current-password" name="current-password"
+            <input type="password" id="current-password" name="currentPassword"
                    placeholder="現在のパスワードを入力">
             <button type="button" class="show-btn"
                     onclick="togglePassword('current-password', this)">表示</button>
@@ -24,7 +24,7 @@
         
         <label>新しいパスワード</label>
         <div class="password-wrapper">
-            <input type="password" id="new-password" name="new-password"
+            <input type="password" id="new-password" name="newPassword"
                    placeholder="新しいパスワードを入力">
             <button type="button" class="show-btn"
                     onclick="togglePassword('new-password', this)">表示</button>
@@ -35,10 +35,9 @@
     		<p class="condition">※8文字以上で設定してください</p>
 		</c:if>
         
-        
-        <label>新しいパスワード（確認）</label>
+        <label>新しいパスワードの確認</label>
         <div class="password-wrapper">
-            <input type="password" id="confirm-password" name="confirm-password"
+            <input type="password" id="confirm-password" name="confirmPassword"
                    placeholder="新しいパスワードの確認">
             <button type="button" class="show-btn"
                     onclick="togglePassword('confirm-password', this)">表示</button>

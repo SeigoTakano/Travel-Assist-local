@@ -6,11 +6,11 @@
 <head>
 	<meta charset="UTF-8">
 	<title>ユーザー名を変更</title>
-	<link rel="stylesheet" href="../../css/mypage/change/username.css">
+	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/mypage/change/username.css">
 </head>
 <body>
 	<div class="container">
-    <form action="UsernameChangeServlet" method="post">
+    <form action="<%= request.getContextPath() %>/UsernameChangeServlet" method="post">
     
     	<h1>ユーザーネームを変更</h1>
         

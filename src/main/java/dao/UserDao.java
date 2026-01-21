@@ -136,4 +136,62 @@ public class UserDao {
 
         return null;
     }
+    
+    // username を更新する
+    public boolean updateUsername(String currentUsername, String newUsername) {
+        String sql = "UPDATE users SET username = ? WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newUsername);
+            pstmt.setString(2, currentUsername);
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    // username をキーに email を更新する
+    public boolean updateEmailByUsername(String username, String newEmail) {
+        String sql = "UPDATE users SET email = ? WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newEmail);
+            pstmt.setString(2, username);
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    // username をキーに password を更新する
+    public boolean updatePasswordByUsername(String username, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, username);
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
