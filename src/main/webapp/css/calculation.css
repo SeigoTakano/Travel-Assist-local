@@ -1,0 +1,171 @@
+@charset "UTF-8";
+
+*{box-sizing:border-box}
+:root{
+  --bg:#f2f5fa;/*明るい背景*/
+  --panel:#ffffff;/*カード背景*/
+  --soft:#f5f7fb;/*セクションヘッダ*/
+  --muted:#4a5568;/*補助テキスト*/
+  --text:#1a202c;/*本文*/
+  --accent:#0b63c7;/*主要ボタン*/
+  --accent-2:#2e7d32;/*成功/強調*/
+  --danger:#c62828;/*削除*/
+}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:'Noto Sans JP',system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  font-size:18px;
+  line-height:1.6;
+}
+
+.topbar{
+  height:56px;display:flex;align-items:center;gap:12px;
+  padding:0 16px;border-bottom:1px solid #d1d5db;
+  background:#ffffff;
+  position:sticky;top:0;z-index:10;
+}
+.brand{font-weight:700;letter-spacing:.06em}
+.search{flex:1}
+.search input{width:100%;height:36px;border-radius:10px;border:1px solid #cbd5e1;background:#ffffff;color:var(--text);padding:0 12px}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4d65ff,#9a54ff)}
+
+.layout{display:grid;grid-template-columns:320px 1fr;gap:16px;padding:16px;max-width:1200px;margin:0 auto}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--panel);border:1px solid #e2e8f0;border-radius:16px;padding:16px}
+.stack{display:grid;gap:6px;margin:8px 0}
+.stack input{height:36px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:var(--text);padding:0 10px}
+.date{color:var(--muted);font-size:12px;margin-bottom:6px}
+
+/* Rounding options */
+.rounding-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.radio-option:hover {
+  background-color: #f1f5f9;
+}
+
+.radio-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.radio-option span {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.chart-card{display:grid;gap:8px}
+.legend{display:grid;gap:6px;font-size:15px;color:var(--muted)}
+.legend .entry{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.legend .dot{width:10px;height:10px;border-radius:50%}
+
+.helper{color:var(--muted);font-size:15px}
+.helper h3{margin:0 0 6px;font-size:16px;color:var(--text)}
+.helper ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.helper li{list-style:disc}
+
+/* info popover */
+.helper.info{position:relative;align-self:start;display:inline-flex;gap:8px}
+.info-btn{width:32px;height:32px;border-radius:50%;border:1px solid #cbd5e1;background:#fff;color:#111827;padding:0;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.info-btn span{display:inline-block;transform:translateY(-1px)}
+.info-popover{position:absolute;top:40px;left:0;display:none;min-width:260px;max-width:360px;background:var(--panel);border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.08);padding:12px;z-index:5}
+.helper.info:hover .info-popover,.helper.info:focus-within .info-popover{display:block}
+
+.totals .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0;position:relative}
+.totals strong{font-size:20px}
+
+/* Rounding toggle button */
+.rounding-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.rounding-toggle:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.rounding-toggle[aria-pressed="true"] {
+  background: #e0f2fe;
+  border-color: #0ea5e9;
+  color: #0c4a6e;
+}
+
+.rounding-toggle .rounding-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Adjust the per-person amount to make space for the toggle */
+#perPerson {
+  margin-right: 0; /* Space for the toggle button */
+}
+
+.content{gap:4px}
+.actions{display:flex;gap:6px;margin-bottom: 20px;height: 42px;}
+button{height:40px;border-radius:10px;border:1px solid #1e3a8a;background:var(--accent);color:#ffffff;font-weight:700;padding:0 14px;cursor:pointer}
+button.sec{background:#e5e7eb;color:#111827;border-color:#cbd5e1}
+button.ghost{background:#ffffff;color:#374151;border-color:#d1d5db}
+button.icon{width:40px;padding:0}
+button.del{background:#fff;border-color:#d1d5db;color:var(--danger)}
+
+.category{background:var(--panel);border:1px solid #e2e8f0;border-radius:16px;overflow:hidden}
+.category>header{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:var(--soft);border-bottom:1px solid #e2e8f0}
+.category h2{margin:0;font-size:18px}
+.subtotal{display:flex;gap:8px;align-items:center;color:var(--muted)}
+.subtotal strong{color:var(--text)}
+.items{display:grid;padding:6px 12px;gap:6px}
+
+.item-row{display:grid;grid-template-columns:1fr 160px 40px;gap:6px}
+.item-row input{height:36px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:var(--text);padding:0 10px}
+.item-row .amount{text-align:right}
+
+@media (max-width: 960px){
+  .layout{grid-template-columns:1fr}
+}
+
+/* キーボード操作の可視化 */
+*:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* save bar at the bottom */
+.savebar{display:flex;justify-content:center;gap:8px;padding-top:10px;margin-top:8px}
+#saveData{min-width:220px;height:48px;font-size:18px;border-radius:12px;padding:0 20px}
+@media (max-width: 520px){
+  #saveData{min-width:180px;width:100%}
+}
