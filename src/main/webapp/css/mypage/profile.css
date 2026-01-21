@@ -50,7 +50,7 @@ body {
 
 /* main container */
 .container {
-    width: 60%;
+    width: 40%;
     margin: 40px auto;
     background: white;
     padding: 40px;
@@ -77,7 +77,7 @@ body {
 
 .form-value {
     flex: none;
-    width: 540px;
+    width: 300px;
     height: 15px;
     background: #eee;
     padding: 10px;
