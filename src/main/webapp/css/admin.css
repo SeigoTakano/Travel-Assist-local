@@ -1,0 +1,70 @@
+/* ===== 全体 ===== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== ヘッダー ===== */
+.header {
+	position: fixed;      /* 追加 */
+    top: 0;               /* 追加 */
+    left: 0;              /* 追加 */
+    width: 100%;          /* 追加 */
+    height: 60px;
+    background-color: #8ec3f4;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-sizing: border-box;
+    z-index: 1000;        /* 追加（他要素より前） */
+}
+
+.menu-btn {
+    margin-right: 16px;
+}
+
+.header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.user-icon {
+    font-size: 20px;
+}
+
+/* ===== レイアウト ===== */
+.container {
+    display: flex;
+}
+
+/* ===== サイドバー ===== */
+.sidebar {
+    width: 200px;
+    border-right: 1px solid #ccc;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 12px;
+}
+
+/* ===== メインコンテンツ ===== */
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* ===== レイアウト ===== */
+.container {
+    display: flex;
+    margin-top: 60px;   /* ← ヘッダーの高さ分 */
+}
+

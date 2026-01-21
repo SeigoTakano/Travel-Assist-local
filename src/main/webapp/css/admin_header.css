@@ -1,0 +1,107 @@
+/* 上部ヘッダー */
+.top-header {
+    width: 100%;
+    height: 60px;
+    background: #6bb6ff !important;    
+    color: #6bb6ff !important;             
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+}
+
+/* システム名＋飛行機アイコン */
+.system-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #1f2937;
+}
+
+/* ハンバーガーボタン */
+.hamburger {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #3b82f6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    position: fixed;
+    top: 70px;
+    left: 20px;
+    z-index: 7000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+.hamburger:hover {
+    transform: scale(1.05);
+}
+
+.hamburger span {
+    width: 24px;
+    height: 3px;
+    background: white;
+    border-radius: 3px;
+    transition: all 0.3s;
+}
+
+/* 左からスライドするメニュー */
+.side-menu {
+    position: fixed;
+    top: 60px;           /* ヘッダー下からスタート */
+    left: -260px;         /* 初期は隠す */
+    width: 200px;
+    height: calc(100% - 60px); /* ヘッダーを除いた高さ */
+    background: linear-gradient(to bottom, #3b82f6, #2563eb); 
+    padding: 45px;
+    box-sizing: border-box;
+    transition: left 0.3s ease;
+    z-index: 6000;      /* ヘッダーより前面 */
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    overflow-y: auto;     /* 長くなってもスクロール可能 */
+}
+
+
+/* メニューリンク */
+.side-menu a {
+    display: block;
+    padding: 16px 0;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 6px;
+    padding-left: 12px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.side-menu a:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fffbeb;
+}
+
+/* メニュー開いた状態 */
+.side-menu.open {
+    left: 0;
+}
+
+.hamburger.active {
+    transform: rotate(90deg); /* 開いてる印 */
+}
+

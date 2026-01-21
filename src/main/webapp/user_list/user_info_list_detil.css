@@ -1,0 +1,91 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f5f8fb;
+}
+
+/* ヘッダー */
+.header {
+  background: linear-gradient(#7db7f0, #5fa0e0);
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.user-icon {
+  font-size: 24px;
+}
+
+/* 検索 */
+.search-area {
+  padding: 15px 20px;
+  display: flex;
+  gap: 8px;
+}
+
+.search-area input {
+  width: 300px;
+  padding: 6px;
+}
+
+.search-area button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* テーブル */
+.table-area {
+  padding: 0 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  border: 1px solid #cddff5;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background: #8ec0f0;
+  color: #fff;
+}
+
+.delete-btn {
+  color: #ff5b5b;
+  border: 1px solid #ff5b5b;
+  background: #fff;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+/* 空表示 */
+.empty-message {
+  text-align: center;
+  color: #999;
+  padding: 30px;
+}
+
+/* 投稿 */
+.post-area {
+  margin: 20px;
+  background: #fff;
+  border: 1px solid #cddff5;
+}
+
+.post-area h2 {
+  margin: 0;
+  padding: 10px;
+  background: #8ec0f0;
+  color: #fff;
+}
