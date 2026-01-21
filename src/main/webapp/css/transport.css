@@ -1,6 +1,7 @@
 @charset "UTF-8";
+
 /* ===============================
-    1. ベーススタイル（配色統一版）
+    1. ベーススタイル（一回り縮小・最適化版）
 =============================== */
 * {
     box-sizing: border-box;
@@ -10,14 +11,15 @@ body {
     margin: 0;
     font-family: 'Noto Sans JP', sans-serif;
     background: #f3f6fb; 
-    color: #1f2937;
+    color: #111827; 
+    font-size: 18px; /* 全体のベース */
+    line-height: 1.6;
 }
 
 .container {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 0 16px;
-    /* 修正：ボタンの下に潜り込ませる */
+    margin: 20px auto;
+    padding: 0 20px;
     position: relative;
     z-index: 1; 
 }
@@ -25,49 +27,53 @@ body {
 /* --- タブ --- */
 .tabs {
     display: flex;
-    border-bottom: 2px solid #e5e7eb;
-    margin-bottom: 24px;
+    border-bottom: 3px solid #e5e7eb;
+    margin-bottom: 25px;
+    gap: 8px;
 }
 
 .tab {
     flex: 1;
-    padding: 14px;
+    padding: 16px 10px; 
     background: #fff;
-    border: 1px solid transparent;
+    border: 2px solid #d1d5db;
     border-bottom: none;
-    font-size: 16px;
+    font-size: 19px; 
     cursor: pointer;
-    transition: background 0.2s;
-    border-radius: 8px 8px 0 0;
+    border-radius: 12px 12px 0 0;
     text-align: center;
     color: #4b5563;
-}
-
-.tab.active {
-    background: #2563eb; 
-    color: #fff;
     font-weight: bold;
 }
 
-/* --- メインカード（フォーム部分） --- */
+.tab.active {
+    background: #1d4ed8; 
+    color: #fff;
+    border-color: #1d4ed8;
+}
+
+/* --- メインカード --- */
 .card {
     background: #fff;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    border-radius: 18px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 15px rgba(0,0,0,.1);
 }
 
 h2 {
     margin-top: 0;
-    font-size: 1.25rem;
+    font-size: 26px; 
     color: #111827;
+    border-left: 6px solid #1d4ed8;
+    padding-left: 12px;
+    margin-bottom: 20px;
 }
 
 .form-row {
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 15px;
+    margin-bottom: 20px;
     align-items: flex-end;
 }
 
@@ -75,72 +81,72 @@ h2 {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 label {
-    font-size: 14px;
-    color: #6b7280;
+    font-size: 19px;
+    color: #1f2937;
     font-weight: bold;
 }
 
 select, input {
-    height: 48px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
+    height: 60px; 
+    border-radius: 10px;
+    border: 2px solid #9ca3af;
     padding: 0 12px;
-    font-size: 16px;
+    font-size: 20px;
     background-color: #fff;
 }
 
 .search-btn {
-    height: 52px;
-    border-radius: 10px;
+    height: 68px;
+    border-radius: 12px;
     border: none;
-    background: #2563eb;
+    background: #059669;
     color: #fff;
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 4px 0 #047857;
 }
 
-.search-btn:hover {
-    background: #1d4ed8;
+#compareBtn {
+    background: #2563eb;
+    box-shadow: 0 4px 0 #1d4ed8;
 }
 
 /* ===============================
-    2. 検索結果（チケット風デザイン）
+    2. 検索結果（崩れ防止・最適化版）
 =============================== */
 .comparison-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-top: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
 }
 
 .result-card-mini {
     background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
     position: relative;
     display: flex;
     flex-direction: column;
-    z-index: 1; /* 親のcontainerより低くならないように */
+    min-height: 220px;
 }
 
 .result-card-mini.highlight {
-    border: 2px solid #2563eb;
+    border: 3px solid #1d4ed8;
 }
 
 .card-header {
-    padding: 10px;
+    padding: 12px;
     text-align: center;
     color: white;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 20px;
     border-radius: 11px 11px 0 0;
-    background: #2563eb; 
+    background: #1d4ed8; 
 }
 
 .card-body {
@@ -151,7 +157,7 @@ select, input {
 .result-card-mini::before, .result-card-mini::after {
     content: '';
     position: absolute;
-    top: 30px;
+    top: 42px;
     width: 16px;
     height: 16px;
     background: #f3f6fb; 
@@ -163,51 +169,46 @@ select, input {
 .result-card-mini::after { right: -9px; }
 
 .price {
-    font-size: 1.6rem;
+    font-size: 38px;
     font-weight: bold;
-    color: #2563eb;
-    margin-bottom: 4px;
+    color: #dc2626;
+    margin-bottom: 5px;
+    display: block;
 }
 .price::after {
     content: '円';
-    font-size: 0.9rem;
+    font-size: 18px;
     margin-left: 2px;
 }
 
 .time {
-    font-size: 0.9rem;
+    font-size: 21px;
     font-weight: bold;
-    color: #4b5563;
-    margin-bottom: 10px;
+    color: #1f2937;
+    margin-bottom: 12px;
 }
 
 .dist {
-    font-size: 0.75rem;
-    color: #9ca3af;
-    border-top: 1px dashed #e5e7eb;
-    padding-top: 10px;
+    font-size: 18px;
+    color: #4b5563;
+    border-top: 2px dashed #e5e7eb;
+    padding-top: 12px;
 }
 
 .best-badge {
     position: absolute;
-    top: -12px;
+    top: -15px;
     left: 50%;
     transform: translateX(-50%);
     background: #ef4444; 
     color: white;
-    padding: 2px 12px;
-    font-size: 11px;
+    padding: 4px 12px;
+    font-size: 14px;
     font-weight: bold;
-    border-radius: 4px;
+    border-radius: 6px;
     z-index: 10;
 }
 
 @media (max-width: 768px) {
-    .comparison-grid {
-        grid-template-columns: 1fr;
-    }
-    .form-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
+    .form-row { flex-direction: column; align-items: stretch; }
 }

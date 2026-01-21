@@ -83,7 +83,7 @@
           <div class="results-header small">結果の概要</div> 
           <div id="route-summary" class="results-body small">ルート検索結果が表示されます。</div>
           <div class="center" style="padding: 10px 0;">
-            <button id="add-fav-inline" class="mini-btn primary" style="width: 90%;">★ このルートを保存</button>
+            <button id="add-fav-inline" class="mini-btn primary" style="width: 90%;">★ お気に入りに登録</button>
           </div>
         </div> 
  

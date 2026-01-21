@@ -11,8 +11,9 @@
 
     <div class="system-name">✈ トラベルアシスト</div>
     
-    <a href="#" class="icon">
-        <img src="" style="width:30px; height:30px; background:#ddd; border-radius:50%;" />
+    <a href="${pageContext.request.contextPath}/mypage/profile.jsp" class="icon">
+    	<span class="user-name">${username} さん　</span>
+        <img src="${pageContext.request.contextPath}/images/profile/profile.png" alt="プロフィール" />
     </a>
 </header>
 

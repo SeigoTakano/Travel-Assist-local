@@ -1,4 +1,4 @@
-/* --- 基本設定 --- */
+/* --- 基本設定（一番最初に戻しました） --- */
 * { box-sizing: border-box; }
 
 body {
@@ -26,11 +26,34 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* --- システム名（最初に戻しました） --- */
+.system-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #111827;
+}
+
+/* --- アイコン部分の修正（ここだけ調整！） --- */
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon img {
+    width: 45px;      /* 30pxだと小さいので、押しやすい45pxに調整 */
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover; /* これで画像の余白を消して枠いっぱいに表示します */
+    background: none;  /* 灰色の背景をカット */
+    border: 2px solid #3b82f6; /* アイコンをはっきりさせるための枠線 */
+}
+
+/* --- ハンバーガーボタン（最初に戻しました） --- */
 .hamburger {
     position: fixed;
     top: 75px; 
     left: 20px;
-    /* 修正：最前面へ引き出す */
     z-index: 9999 !important; 
     width: 45px;
     height: 45px;
@@ -42,7 +65,6 @@ body {
     align-items: center;
     gap: 5px;
     cursor: pointer;
-    /* 修正：クリック判定を保証 */
     pointer-events: auto !important; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
@@ -52,10 +74,10 @@ body {
     height: 2px; 
     background: white; 
     transition: 0.3s; 
-    pointer-events: none; /* 中の線がクリックを邪魔しないように */
+    pointer-events: none;
 }
 
-/* サイドメニュー */
+/* --- サイドメニュー（最初に戻しました） --- */
 .side-menu {
     position: fixed;
     top: 60px;
@@ -64,7 +86,6 @@ body {
     height: calc(100% - 60px);
     background: #3b82f6;
     transition: 0.3s;
-    /* 修正：ヘッダーより上でボタンより下 */
     z-index: 9000 !important; 
     padding: 20px;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
@@ -78,3 +99,25 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.1); 
 }
 
+/* --- ユーザー名のスタイル（ここを調整しました） --- */
+.user-name {
+    font-size: 16px;       /* 14pxから16pxへ少し大きくして読みやすく */
+    font-weight: 600;      /* 太すぎず、存在感のある太さに */
+    color: #374151;       /* 少しだけ濃いグレーにして視認性をアップ */
+    max-width: 120px;     /* 表示幅を少し広めに確保 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* アイコンとの高さのバランスを整える */
+    line-height: 1;
+}
+
+/* ついでに、マウスを乗せた時に少しだけ浮き上がるような演出（任意） */
+.user-link:hover .user-name {
+    color: #1d4ed8;       /* ホバー時に青色に */
+}
+
+.user-link:hover .icon img {
+    border-color: #1d4ed8; /* ホバー時にアイコンの枠も青く */
+    opacity: 0.8;
+}
