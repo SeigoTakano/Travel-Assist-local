@@ -1,0 +1,130 @@
+body {
+
+    font-family: sans-serif;
+
+    background: #f7f7f7;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+/* メイン部分 */
+
+.main {
+
+    width: 90%;
+
+    max-width: 1000px;
+
+    margin: 40px auto;
+
+    padding: 20px;
+
+}
+
+/* ページタイトル */
+
+.page-title {
+
+    background: #6bb6ff;
+
+    color: white;
+
+    padding: 12px;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    border-radius: 6px;
+
+}
+
+/* 検索ボックス */
+
+.search-box {
+
+    margin: 20px auto;
+
+    text-align: center;
+
+}
+
+.search-box input {
+
+    width: 300px;
+
+    padding: 6px 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 4px;
+
+}
+
+.search-box button {
+
+    padding: 6px 12px;
+
+    margin-left: 6px;
+
+    border: none;
+
+    border-radius: 4px;
+
+    background: #6bb6ff;
+
+    color: white;
+
+    cursor: pointer;
+
+}
+
+/* テーブル */
+
+.user-table {
+
+    width: 100%;
+
+    margin: 20px auto;
+
+    border-collapse: collapse;
+
+    background: white;
+
+    box-shadow: 0 0 8px #ccc;
+
+}
+
+.user-table th {
+
+    background: #d8ecff;
+
+    padding: 10px;
+
+}
+
+.user-table td {
+
+    padding: 10px;
+
+    border-bottom: 1px solid #ddd;
+
+}
+
+/* データなし表示 */
+
+.no-data {
+
+    text-align: center;
+
+    color: #777;
+
+    padding: 20px;
+
+}
+ 
