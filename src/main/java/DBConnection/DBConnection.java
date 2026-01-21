@@ -1,36 +1,28 @@
 package DBConnection;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 public class DBConnection {
 
-    private static final String URL =
-            "jdbc:mysql://localhost:3306/travelassist?useSSL=false&serverTimezone=Asia/Tokyo";
-    private static final String USER = "root";
-    private static final String PASSWORD = "travelassist";
-
     public static Connection getConnection() throws SQLException {
         try {
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
+            // context.xmlから設定を読み込むための定型文
+            Context initContext = new InitialContext();
+            Context envContext = (Context) initContext.lookup("java:/comp/env");
+            
+            // context.xmlの name="jdbc/travelassist" と一致させる
+            DataSource ds = (DataSource) envContext.lookup("jdbc/travelassist");
+            
+            return ds.getConnection();
+        } catch (NamingException e) {
             e.printStackTrace();
-            throw new SQLException("MySQLドライバー（JAR）がプロジェクトに入っていません。");
-        }
-        return DriverManager.getConnection(URL, USER, PASSWORD);
-    }
-
-    // 接続テスト用メインメソッド
-    public static void main(String[] args) {
-        try (Connection conn = getConnection()) {
-            if (conn != null) {
-                System.out.println("データベース「TravelAssist」への接続に成功しました！");
-            }
-        } catch (SQLException e) {
-            System.err.println("接続に失敗しました。");
-            e.printStackTrace();
+            throw new SQLException("データベースの設定が見つかりません。");
         }
     }
 }
