@@ -68,7 +68,7 @@ public class RouteDao {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("【SQLエラー】データ取得に失敗したぜ: " + e.getMessage());
+            System.err.println("【SQLエラー】データ取得に失敗: " + e.getMessage());
             e.printStackTrace();
         }
         return routeList;
