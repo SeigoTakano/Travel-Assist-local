@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/profile")
 public class ProfileServlet extends HttpServlet {
@@ -17,34 +18,38 @@ public class ProfileServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // テスト用
-        int loginUserId = 1;
+        // セッション取得
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            // セッションがない場合はログイン画面へリダイレクト
+            response.sendRedirect(request.getContextPath() + "/login/login.jsp");
+            return;
+        }
 
+        // Session から username を取得
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            // username が Session にない場合もログイン画面へ
+            response.sendRedirect(request.getContextPath() + "/login/login.jsp");
+            return;
+        }
+
+        // DB からユーザー情報を取得
         UserDao dao = new UserDao();
         User user = null;
-
         try {
-            user = dao.getUserById(loginUserId);
-            
-            if (user != null) {
-                System.out.println("===== DBからユーザー取得成功 =====");
-                System.out.println("ID      : " + user.getId());
-                System.out.println("Username: " + user.getUsername());
-                System.out.println("Email   : " + user.getEmail());
-            } else {
-                System.out.println("ユーザーが見つかりません（ID=" + loginUserId + "）");
-            }
+            user = dao.getUserByUsername(username); // username で検索
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         if (user != null) {
-            request.setAttribute("userid", user.getId());
             request.setAttribute("email", user.getEmail());
             request.setAttribute("username", user.getUsername());
         }
 
-        request.getRequestDispatcher("/mypage/profile.jsp")
-               .forward(request, response);
+        // profile.jsp にフォワード
+        request.getRequestDispatcher("/mypage/profile.jsp").forward(request, response);
     }
 }
+

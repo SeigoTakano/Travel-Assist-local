@@ -41,10 +41,11 @@
                     <span class="text-sm font-medium text-slate-600 hidden sm:block">
                         <%= username %> 様
                     </span>
-                    <button class="text-slate-500 hover:text-blue-600 transition relative">
-                        <i class="fas fa-bell text-lg"></i>
-                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                    </button>
+                    <a href="<%= request.getContextPath() %>/profile"
+                    	class="text-slate-500 hover:text-blue-600 transition relative">
+                        	<i class="fas fa-bell text-lg"></i>
+                        	<span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    </a>
                     <a href="logout" class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition" title="ログアウト">
                         <i class="fas fa-sign-out-alt text-sm"></i>
                     </a>

@@ -109,4 +109,31 @@ public class UserDao {
         }
         return false;
     }
+    
+    // username をもとにユーザー情報を取得する
+    public User getUserByUsername(String username) {
+        String sql = "SELECT id, email, password, username FROM users WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("username")
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

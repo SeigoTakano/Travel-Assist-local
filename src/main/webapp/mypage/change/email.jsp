@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>メールアドレスを変更</title>
-    <link rel="stylesheet" href="../../css/mypage/change/email.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/mypage/change/email.css">
 </head>
 <body>
     <div class="container">

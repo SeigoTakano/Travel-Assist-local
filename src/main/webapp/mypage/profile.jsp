@@ -30,12 +30,6 @@
     			class="btn-primary">編集</a>
 		</div>
 
-        <!-- ID（変更不可） -->
-        <div class="form-group">
-    		<span class="form-label">ID</span>
-    		<span class="form-value">${userid}</span>
-		</div>
-
         <!-- メールアドレス -->
         <div class="form-group">
     		<span class="form-label">メールアドレス</span>
