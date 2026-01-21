@@ -11,7 +11,7 @@
 
     <div class="system-name">✈ トラベルアシスト</div>
     
-    <a href="${pageContext.request.contextPath}/mypage/profile.jsp" class="icon">
+    <a href="<%= request.getContextPath() %>/profile" class="icon">
     	<span class="user-name">${username} さん　</span>
         <img src="${pageContext.request.contextPath}/images/profile/profile.png" alt="プロフィール" />
     </a>
