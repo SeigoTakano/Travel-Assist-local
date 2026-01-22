@@ -46,7 +46,7 @@
                         	<i class="fas fa-bell text-lg"></i>
                         	<span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
                     </button>
-                    <a href="logout" class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition" title="ログアウト">
+                    <a href="<%= request.getContextPath() %>/logout" class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition" title="ログアウト">
                         <i class="fas fa-sign-out-alt text-sm"></i>
                     </a>
                 </div>
