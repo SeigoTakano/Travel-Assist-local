@@ -1,94 +1,58 @@
-html,
-body {
-  height: 100%;
-}
-
-.form-signin {
-  max-width: 330px;
-  padding: 1rem;
-  margin: auto;
-}
-
-.form-signin .form-floating:focus-within {
-  z-index: 2;
-}
-
-.form-signin input[type="email"] {html,
-body {
+html, body {
   height: 100%;
 }
 
 body {
-  /* 追加：Flexboxを使って上下左右中央に配置 */
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 背景色を少し明るいグレーにすると今風になります（お好みで） */
   background-color: #f8f9fa;
+  margin: 0;
 }
 
 .form-signin {
   width: 100%;
   max-width: 330px;
-  padding: 1rem;
-  /* margin: auto; は不要になりますが、残しておいても問題ありません */
+  padding: 15px;
+  /* position: relative を指定して子要素の z-index を有効にする */
+  position: relative; 
 }
 
-/* --- 以下、既存のスタイル --- */
-.form-signin .form-floating:focus-within {
-  z-index: 2;
+.form-floating {
+  margin-bottom: -1px; /* 入力欄をくっつける演出 */
+  z-index: 1;
 }
 
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
+#floatingInput {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
+#floatingPassword {
+  margin-bottom: 15px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
 
+/* ✅ リンク集のクリック判定を確実に確保する設定 */
+.link-group {
+  position: relative;
+  z-index: 10; /* ボタンや入力欄より手前に出す */
+}
+
 .link-group a {
-  font-size: 0.85rem; /* 少し小さくするとバランスが良いです */
+  font-size: 0.85rem;
   color: #0d6efd;
-  transition: color 0.2s ease;
+  text-decoration: none;
+  /* クリック範囲が重ならないように明示 */
+  position: relative;
+  pointer-events: auto !important; 
 }
 
 .link-group a:hover {
   text-decoration: underline;
-  color: #0a58ca;
-}
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
 }
 
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+.btn-primary {
+  z-index: 5;
 }
-
-/* ✅ 新規登録・パスワード忘れ 横並び調整 */
-.link-group a {
-  color: #0d6efd;
-  transition: color 0.2s ease;
-}
-
-.link-group a:hover {
-  text-decoration: underline;
-  color: #0a58ca;
-}
-
-/* ✅ ログインボタン */
-.form-signin .btn-primary {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.form-floating { margin-bottom: 15px; }
-
-.error-message { color: red; font-size: 0.9em; margin-top: -8px; margin-bottom: 10px; }
