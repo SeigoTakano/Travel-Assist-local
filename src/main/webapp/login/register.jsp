@@ -47,6 +47,9 @@
         <div class="mt-3">
           <a href="${pageContext.request.contextPath}/login/login.jsp">ログイン画面に戻る</a>
         </div>
+        
+        <p class="mt-5 mb-3 text-body-secondary">&copy; 2026 Travel Assist</p>
+        
       </form>
     </main>
 

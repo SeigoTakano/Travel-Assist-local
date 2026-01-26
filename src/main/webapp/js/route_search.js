@@ -209,11 +209,18 @@ function renderHistory(){
   });
 }
 
+// 1. この関数を既存のものと入れ替えてください
 function renderFavorites(){
   els.favoritesList.innerHTML = STORE.favorites.length ? '' : '<li>お気に入りなし</li>';
   STORE.favorites.forEach((f, idx) => {
     const li = document.createElement('li');
-    li.innerHTML = `<div>${f.origin} → ${f.destination}</div>`;
+    // ボタンを追加し、onclickで削除関数を呼ぶようにします
+    li.innerHTML = `
+      <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+        <span>${f.origin} → ${f.destination}</span>
+        <button class="mini-btn danger" onclick="deleteFavorite(${idx}, ${f.id || 'null'})" style="margin-left:10px;">削除</button>
+      </div>
+    `;
     els.favoritesList.appendChild(li);
   });
 }
@@ -222,3 +229,27 @@ function clearHistory(){ STORE.history = []; saveStore(STORE.historyKey, []); re
 
 function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 async function onPlaceSearch(){ /* 既存のまま */ }
+
+// 2. この関数を JS の最後の方に追加してください
+async function deleteFavorite(index, dbId) {
+  if(!confirm('お気に入りから削除しますか？')) return;
+
+  // DBからの削除処理（IDがある場合のみ）
+  if(dbId && dbId !== null) {
+    const params = new URLSearchParams();
+    params.append('action', 'delete');
+    params.append('id', dbId);
+    try {
+      await fetch('../saveRoute', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString() 
+      });
+    } catch(e) { console.error("DB削除失敗", e); }
+  }
+
+  // 画面とLocalStorageからの削除
+  STORE.favorites.splice(index, 1);
+  saveStore(STORE.favoritesKey, STORE.favorites);
+  renderFavorites();
+}
