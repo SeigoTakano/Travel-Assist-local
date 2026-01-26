@@ -12,13 +12,13 @@
     <div class="system-name">✈ トラベルアシスト</div>
     
     <a href="<%= request.getContextPath() %>/profile" class="icon">
-    	<span class="user-name">${username} さん　</span>
+        <span class="user-name">${username} さん</span>
         <img src="${pageContext.request.contextPath}/images/profile/profile.png" alt="プロフィール" />
     </a>
 </header>
 
 <nav class="side-menu" id="side-menu">
-    <a href="${pageContext.request.contextPath}/index.jsp">プラン作成</a>
+    <a href="${pageContext.request.contextPath}/create_plan/create_plan.jsp">プラン作成</a>
     <a href="${pageContext.request.contextPath}/route_search/route_search.jsp">ルート検索</a>
     <a href="${pageContext.request.contextPath}/transport/transport.jsp">交通機関検索</a>
     <a href="${pageContext.request.contextPath}/weather/weather.jsp">天気検索</a>

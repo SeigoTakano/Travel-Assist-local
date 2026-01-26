@@ -6,53 +6,75 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa;
+  background-color: #f3f4f6;
   margin: 0;
 }
 
+/* --- フォーム全体のコンテナ --- */
 .form-signin {
   width: 100%;
-  max-width: 330px;
-  padding: 15px;
-  /* position: relative を指定して子要素の z-index を有効にする */
-  position: relative; 
+  max-width: 450px;
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
-.form-floating {
-  margin-bottom: -1px; /* 入力欄をくっつける演出 */
-  z-index: 1;
+.form-signin h1 {
+  font-weight: 700;
+  margin-bottom: 35px !important;
+  color: #111827;
 }
 
-#floatingInput {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+/* --- 🚩 Bootstrapの競合を解消するセクション --- */
+
+/* 入力欄の周りに余白を強制的に作る */
+.form-signin .form-floating {
+  margin-bottom: 20px !important; 
 }
 
-#floatingPassword {
-  margin-bottom: 15px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+/* Bootstrapが角を削ったり境界線を消したりするのを防ぐ */
+.form-signin .form-control {
+  height: 60px !important;
+  border-radius: 8px !important; 
+  border: 1px solid #ced4da !important;
 }
 
-/* ✅ リンク集のクリック判定を確実に確保する設定 */
+/* フォーカス時の色合い */
+.form-control:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+}
+
+/* --- リンク集 --- */
 .link-group {
-  position: relative;
-  z-index: 10; /* ボタンや入力欄より手前に出す */
+  margin-bottom: 30px !important;
 }
 
 .link-group a {
-  font-size: 0.85rem;
-  color: #0d6efd;
+  font-size: 0.95rem;
+  color: #3b82f6;
   text-decoration: none;
-  /* クリック範囲が重ならないように明示 */
-  position: relative;
-  pointer-events: auto !important; 
+  font-weight: 500;
 }
 
 .link-group a:hover {
   text-decoration: underline;
 }
 
+/* --- ログインボタン --- */
 .btn-primary {
-  z-index: 5;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  background-color: #3b82f6 !important;
+  border: none !important;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb !important;
+  transform: translateY(-1px);
 }

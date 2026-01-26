@@ -1,11 +1,10 @@
-/* --- 基本設定（一番最初に戻しました） --- */
+/* --- 基本設定 --- */
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
     font-family: sans-serif;
     background-color: #f3f4f6;
-    /* ヘッダー(60px) + 余裕(20px) = 80px 確実に空ける */
     padding-top: 80px !important; 
     padding-bottom: 50px;
 }
@@ -26,30 +25,47 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* --- システム名（最初に戻しました） --- */
+/* --- システム名 --- */
 .system-name {
     font-size: 20px;
     font-weight: bold;
     color: #111827;
 }
 
-/* --- アイコン部分の修正（ここだけ調整！） --- */
+/* --- アイコン部分（下線を消しました） --- */
 .icon {
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none; /* 🚩これでユーザーネームの下線が消えます */
 }
 
 .icon img {
-    width: 45px;      /* 30pxだと小さいので、押しやすい45pxに調整 */
+    width: 45px;
     height: 45px;
     border-radius: 50%;
-    object-fit: cover; /* これで画像の余白を消して枠いっぱいに表示します */
-    background: none;  /* 灰色の背景をカット */
-    border: 2px solid #3b82f6; /* アイコンをはっきりさせるための枠線 */
+    object-fit: cover;
+    background: none;
+    border: 2px solid #3b82f6;
+    transition: 0.3s;
 }
 
-/* --- ハンバーガーボタン（最初に戻しました） --- */
+/* --- ユーザー名のスタイル --- */
+.user-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1;
+    text-decoration: none !important;
+    margin-right: 12px; /* 🚩アイコンとの間に程よい隙間を作ります */
+    transition: 0.3s;
+}
+
+/* --- ハンバーガーボタン --- */
 .hamburger {
     position: fixed;
     top: 75px; 
@@ -77,7 +93,7 @@ body {
     pointer-events: none;
 }
 
-/* --- サイドメニュー（最初に戻しました） --- */
+/* --- サイドメニュー --- */
 .side-menu {
     position: fixed;
     top: 60px;
@@ -99,25 +115,12 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.1); 
 }
 
-/* --- ユーザー名のスタイル（ここを調整しました） --- */
-.user-name {
-    font-size: 16px;       /* 14pxから16pxへ少し大きくして読みやすく */
-    font-weight: 600;      /* 太すぎず、存在感のある太さに */
-    color: #374151;       /* 少しだけ濃いグレーにして視認性をアップ */
-    max-width: 120px;     /* 表示幅を少し広めに確保 */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    /* アイコンとの高さのバランスを整える */
-    line-height: 1;
+/* --- ホバーエフェクト --- */
+.icon:hover .user-name {
+    color: #1d4ed8;
 }
 
-/* ついでに、マウスを乗せた時に少しだけ浮き上がるような演出（任意） */
-.user-link:hover .user-name {
-    color: #1d4ed8;       /* ホバー時に青色に */
-}
-
-.user-link:hover .icon img {
-    border-color: #1d4ed8; /* ホバー時にアイコンの枠も青く */
-    opacity: 0.8;
+.icon:hover img {
+    border-color: #1d4ed8;
+    transform: scale(1.05); /* 少しだけ大きくして「押せる感」を出す */
 }

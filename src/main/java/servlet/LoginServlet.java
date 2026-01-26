@@ -2,6 +2,7 @@ package servlet;
 
 import java.io.IOException;
 
+import bean.User;
 import dao.LoginDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,16 +23,20 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         
         LoginDao dao = new LoginDao();
-        String username = dao.getUsernameByLogin(email, password);
+        // 戻り値をUser型で受け取る
+        User user = dao.login(email, password);
 
-        if (username != null) {
+        if (user != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("username", username);
-            // menu.jspはwebapp直下にある場合はこのままでOK
+            // IDと名前を両方セッションに保存
+            session.setAttribute("userId", user.getId()); 
+            session.setAttribute("username", user.getUsername());
+            
+            // ログイン成功時はメニューへ
             response.sendRedirect("menu.jsp"); 
         } else {
             request.setAttribute("error", "メールアドレス、またはパスワードが正しくありません。");
-            // 修正箇所：フォルダ名を含める
+            // login.jspがwebapp/login/フォルダ内にある場合のパス
             request.getRequestDispatcher("login/login.jsp").forward(request, response);
         }
     }

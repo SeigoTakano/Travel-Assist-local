@@ -1,56 +1,55 @@
 package dao;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Base64;
 
 import DBConnection.DBConnection;
+import bean.User;
 
 /**
  * ユーザー認証および登録に関するデータベース操作を担当するクラス
  */
 public class LoginDao {
-    
+
     /**
-     * ログイン認証を行い、成功した場合はユーザー名を返します。
-     * @param email メールアドレス
-     * @param password パスワード
-     * @return 認証成功時はusername、失敗時はnull
+     * ログイン認証を行い、成功した場合はUserオブジェクトを返します。
      */
-    public String getUsernameByLogin(String email, String password) {
-        String sql = "SELECT username FROM users WHERE email = ? AND password = ? AND user_del IS NULL";
+    public User login(String email, String password) {
+        String sql = "SELECT id, username FROM users WHERE email = ? AND password = ? AND user_del IS NULL";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, email);
-            pstmt.setString(2, password);
+            // 入力されたパスワードをハッシュ化してDBと比較
+            pstmt.setString(2, hashPassword(password));
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString("username");
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    return user;
                 }
             }
         } catch (Exception e) {
-            // DBConnectionからの例外をまとめてキャッチ
             e.printStackTrace();
         }
         return null;
     }
 
     /**
-     * メールアドレスが既にデータベースに存在するかチェックします。
-     * @param email チェックするメールアドレス
-     * @return 存在すればtrue、存在しなければfalse
+     * メールアドレスの重複チェック
      */
     public boolean isEmailExists(String email) {
         String sql = "SELECT id FROM users WHERE email = ?";
-        
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
             pstmt.setString(1, email);
-            
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next();
             }
@@ -61,51 +60,59 @@ public class LoginDao {
     }
 
     /**
-     * ユーザーを新規登録します。
-     * @param username ユーザー名
-     * @param email メールアドレス
-     * @param password パスワード
-     * @return 登録成功ならtrue、失敗ならfalse
+     * ユーザーを新規登録（パスワードをハッシュ化して保存）
      */
     public boolean registerUser(String username, String email, String password) {
         String sql = "INSERT INTO users (username, email, password, create_user, update_user) VALUES (?, ?, ?, ?, ?)";
-        
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, username);
             pstmt.setString(2, email);
-            pstmt.setString(3, password);
-            pstmt.setString(4, username); // create_user
-            pstmt.setString(5, username); // update_user
+            // パスワードをハッシュ化
+            pstmt.setString(3, hashPassword(password));
+            pstmt.setString(4, username);
+            pstmt.setString(5, username);
             
-            int result = pstmt.executeUpdate();
-            return result > 0;
-            
+            return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-    
-    public boolean updatePassword(String email, String newPassword) {
-        // テーブル定義に合わせて update_date と update_user を使用
-        String sql = "UPDATE users SET password = ?, update_date = CURRENT_TIMESTAMP, update_user = ? WHERE email = ? AND user_del IS NULL";
 
+    /**
+     * パスワード更新（ハッシュ化して更新）
+     */
+    public boolean updatePassword(String email, String newPassword) {
+        String sql = "UPDATE users SET password = ?, update_date = CURRENT_TIMESTAMP, update_user = ? WHERE email = ? AND user_del IS NULL";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, newPassword);
-            pstmt.setString(2, "SYSTEM_RESET"); // 更新者として適当な名前を入れる
+            pstmt.setString(1, hashPassword(newPassword));
+            pstmt.setString(2, "SYSTEM_RESET");
             pstmt.setString(3, email);
 
-            int rowsUpdated = pstmt.executeUpdate();
-            return rowsUpdated > 0;
-
+            return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
-            System.err.println("【SQLエラー】パスワード更新に失敗しました。");
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * パスワードをSHA-256でハッシュ化し、Base64形式の文字列で返す内部メソッド
+     */
+    private String hashPassword(String password) {
+        if (password == null || password.isEmpty()) {
+            return "";
+        }
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("ハッシュ化に失敗しました", e);
+        }
     }
 }
