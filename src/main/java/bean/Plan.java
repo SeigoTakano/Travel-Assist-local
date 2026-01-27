@@ -70,4 +70,14 @@ public class Plan implements Serializable {
 	public void setBudget(int budget) {
 		this.budget = budget;
 	}
+	
+	// planIdのセッター（互換性のため）
+	public void setPlanId(int planId) {
+		this.id = planId;
+	}
+	
+	// planIdのゲッター（互換性のため）
+	public int getPlanId() {
+		return this.id;
+	}
 }
