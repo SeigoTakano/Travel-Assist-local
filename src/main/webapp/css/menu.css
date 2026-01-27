@@ -1,78 +1,94 @@
-/* レイアウト全体の調整（ヘッダーの高さ分を考慮） */
+/* menu.css */
+
 .menu-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+    font-family: 'sans-serif';
 }
 
-/* 「これまでに作ったプラン」ラベル */
 .section-title {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #1d4ed8;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
-/* グレーのプランボックス */
+/* プランボックス：単色グレーからグラデーションで少し高級感を出す */
 .plan-box {
-    background-color: #cccccc; /* スクショの少し濃いめのグレー */
+    background: linear-gradient(145deg, #e6e6e6, #cccccc);
     height: 220px;
     border-radius: 20px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 1px solid #999;
+    border: 1px solid #bbb;
     margin-bottom: 25px;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
 }
 
 .no-plan-text {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    color: #333;
+    color: #666; /* 少し色を落として落ち着かせる */
 }
 
-/* 2カラムのグリッドボタン */
 .function-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 25px;
+    gap: 15px; /* 少し広げる */
+    margin-bottom: 30px;
 }
 
+/* 各ボタンにホバーエフェクトを追加 */
 .func-btn {
     background-color: #fff;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 18px; /* 少し厚みを持たせる */
+    border-radius: 12px; /* 丸みを強く */
     text-align: center;
     text-decoration: none;
     color: #333;
     font-weight: bold;
-    border: 1px solid #eee;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    transition: all 0.2s ease; /* アニメーション */
 }
 
-.func-btn:active {
-    background-color: #f0f0f0;
+.func-btn:hover {
+    transform: translateY(-2px); /* 浮き上がる */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #2563eb;
+    color: #2563eb;
 }
 
-/* 一番下の青いデカボタン */
+.func-btn .icon {
+    font-size: 1.4rem;
+}
+
+/* メインボタンの調整 */
 .create-plan-btn {
     display: block;
-    background-color: #2563eb;
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
     color: white;
     text-align: center;
-    padding: 16px;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: 15px;
     text-decoration: none;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transition: all 0.2s;
 }
 
 .create-plan-btn:hover {
-    background-color: #1d4ed8;
+    transform: scale(1.02); /* 少し大きく */
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
 }
