@@ -110,4 +110,18 @@ public class PlanDaoImpl {
         }
         return null;
     }
+    
+    // プランを削除
+    public boolean delete(int id) {
+        String sql = "DELETE FROM plans WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
