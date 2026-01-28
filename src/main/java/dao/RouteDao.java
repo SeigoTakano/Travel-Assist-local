@@ -13,7 +13,9 @@ import bean.Route;
 
 public class RouteDao {
 
+    // 保存処理
     public boolean insertRoute(int userId, String start, String end, String polyline, boolean isFavorite) {
+        // 主キーが自動増分なら route_number は含めなくてOK
         String sql = "INSERT INTO route_history (user_id, start_name, end_name, route_polyline, spot_details, is_favorite, searched_user, searched_at, updated_user, updated_at) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -36,9 +38,9 @@ public class RouteDao {
         }
     }
 
-    // ★ 削除メソッド
+    // ★ 削除メソッド（主キーを route_number に修正）
     public boolean deleteRoute(int routeId) {
-        String sql = "DELETE FROM route_history WHERE id = ?";
+        String sql = "DELETE FROM route_history WHERE route_number = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, routeId);
@@ -49,34 +51,9 @@ public class RouteDao {
         }
     }
 
-    public List<Route> getRoutesByUserId(int userId) {
-        List<Route> routeList = new ArrayList<>();
-        String sql = "SELECT * FROM route_history WHERE user_id = ? ORDER BY searched_at DESC";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Route route = new Route();
-                    route.setId(rs.getInt("id"));
-                    route.setUserId(rs.getInt("user_id"));
-                    route.setStartName(rs.getString("start_name"));
-                    route.setEndName(rs.getString("end_name"));
-                    route.setPolyline(rs.getString("route_polyline"));
-                    route.setFavorite(rs.getBoolean("is_favorite"));
-                    route.setSearchedAt(rs.getTimestamp("searched_at"));
-                    routeList.add(route);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return routeList;
-    }
-    
+    // 履歴取得（最新5件）
     public List<Route> getRecentRoutes(int userId, int limit) {
         List<Route> routeList = new ArrayList<>();
-        // カラム名を id -> route_number に修正
         String sql = "SELECT * FROM route_history WHERE user_id = ? ORDER BY searched_at DESC LIMIT ?";
         
         try (Connection conn = DBConnection.getConnection();
@@ -88,7 +65,7 @@ public class RouteDao {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Route route = new Route();
-                    // ここを修正：rs.getInt("id") ではなく "route_number"
+                    // ★重要：DBのカラム名に合わせて route_number を取得
                     route.setId(rs.getInt("route_number")); 
                     route.setUserId(rs.getInt("user_id"));
                     route.setStartName(rs.getString("start_name"));

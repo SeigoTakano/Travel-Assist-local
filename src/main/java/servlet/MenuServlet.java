@@ -47,7 +47,7 @@ public class MenuServlet extends HttpServlet {
          */
 
         // 4. menu.jsp へフォワード
-        request.getRequestDispatcher("/WEB-INF/view/menu.jsp").forward(request, response);
+        request.getRequestDispatcher("/menu.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 

@@ -22,13 +22,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resultContentContainer = document.getElementById('resultContent');
     const resultSection = document.getElementById('resultCard');
 
-    // データの読み込み
+    // --- データの読み込み (ここを修正しました) ---
     try {
-        const response = await fetch('transport_data.json');
-        if (!response.ok) throw new Error("JSON file not found");
+        // JSPで定義した contextPath を使用して、絶対パスで取得
+        const jsonPath = `${contextPath}/transport/transport_data.json`;
+        console.log("Fetching JSON from:", jsonPath); // デバッグ用
+
+        const response = await fetch(jsonPath);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
         masterData = await response.json();
+        console.log("JSON loaded successfully");
+        
+        // データがロードされたら初期リストを表示
+        updateStationSelectOptions();
     } catch (error) {
         console.error("データの読み込みに失敗:", error);
+        alert("データの読み込みに失敗しました。パスを確認してください。");
         return;
     }
 
@@ -97,6 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!originStation || !destStation) return null;
 
             const settings = transportSettings[type];
+            // 簡易的な距離計算
             const distanceKm = Math.sqrt(Math.pow((originStation.lat - destStation.lat) * 111, 2) + Math.pow((originStation.lng - destStation.lng) * 91, 2)) * 1.15;
 
             let cost = distanceKm * settings.costPerKm;
@@ -120,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="card-header" style="background:${res.color}">${res.label}</div>
                 <div class="card-body">
                     <div class="location-info">${res.originName} ➔ ${res.destName}</div>
-                    <div class="price">${res.totalCost.toLocaleString()}</div>
+                    <div class="price">¥${res.totalCost.toLocaleString()}</div>
                     <div class="time">約 ${Math.floor(res.totalTimeMin / 60)}h ${res.totalTimeMin % 60}m</div>
                 </div>
             `;
@@ -130,9 +141,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         resultSection.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // セレクトボックスの選択肢更新
     function updateStationSelectOptions() {
-        const currentType = document.querySelector('.tab.active').dataset.type;
+        const activeTab = document.querySelector('.tab.active');
+        if (!activeTab || !masterData[activeTab.dataset.type]) return;
+
+        const currentType = activeTab.dataset.type;
         const allStations = Object.values(masterData[currentType]).flat().sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+        
         [departureSelect, destinationSelect].forEach(select => {
             const previous = select.value;
             select.innerHTML = '<option value="" disabled selected>選択してください</option>';
@@ -145,6 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         refreshCompareButtonState();
     }
 
+    // タブ切り替えイベント
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -155,11 +172,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // 各種リスナー
     departureSelect.addEventListener('change', refreshCompareButtonState);
     destinationSelect.addEventListener('change', refreshCompareButtonState);
     singleSearchBtn.addEventListener('click', () => runSearch(false));
     compareBtn.addEventListener('click', () => runSearch(true));
 
-    updateStationSelectOptions();
+    // 日付の初期値を今日にする
     travelDateInput.valueAsDate = new Date();
 });

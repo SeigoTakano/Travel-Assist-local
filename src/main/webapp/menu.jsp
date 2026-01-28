@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%-- Tomcat 10+ では uri は jakarta.tags.core を使用します --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -7,20 +8,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メニュー - トラベルアシスト</title>
     
-    <%-- base.jsp で header.jsp や共通CSS/JSが読み込まれている前提 --%>
+    <%-- 共通CSS/JS読み込み --%>
     <%@ include file="../base.jsp" %>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/menu.css">
+    
+    <style>
+        /* 簡易的なスタイル調整：リンクを押しやすくする */
+        .history-link {
+            text-decoration: none;
+            color: #333;
+            display: block;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .history-link:hover {
+            background-color: #f0f4ff;
+            color: #2563eb;
+        }
+    </style>
 </head>
 <body>
-
-    <%-- 
-       注意：base.jsp 内で既に <header> や <nav> が出力されている場合は、
-       ここではいきなり <main> から書き始めてOKです。
-    --%>
 
     <main class="menu-container">
         <div class="top-row">
             
+            <%-- プランセクション --%>
             <section class="plan-section">
                 <h2 class="section-title">これまでに作ったプラン</h2>
                 <div class="plan-box">
@@ -39,17 +52,26 @@
                 </div>
             </section>
 
+            <%-- 履歴セクション --%>
             <section class="history-section">
                 <h2 class="section-title">最近の検索</h2>
                 <div class="history-box">
                     <c:choose>
                         <c:when test="${empty recentSpots}">
-                            <p class="no-history-text">なし</p>
+                            <p class="no-history-text">履歴はありません</p>
                         </c:when>
                         <c:otherwise>
-                            <ul class="history-mini-list">
+                            <ul class="history-mini-list" style="list-style: none; padding: 0;">
                                 <c:forEach var="route" items="${recentSpots}">
-                                    <li>📍 ${route.endName}</li>
+                                    <li style="margin-bottom: 8px;">
+                                        <%-- 地図画面へパラメータ（出発地・目的地）を渡すリンク --%>
+                                        <a href="${pageContext.request.contextPath}/route_search/route_search.jsp?start=${route.startName}&dest=${route.endName}" class="history-link">
+                                            📍 ${route.endName}
+                                            <small style="display:block; color: #888; margin-left: 20px;">
+                                                from: ${route.startName}
+                                            </small>
+                                        </a>
+                                    </li>
                                 </c:forEach>
                             </ul>
                         </c:otherwise>
@@ -58,15 +80,16 @@
             </section>
         </div>
 
+        <%-- 機能ボタン一覧 --%>
         <section class="function-grid">
-            <a href="${pageContext.request.contextPath}/weather/weather.jsp" class="func-btn">☀️ 天気検索</a>
-            <a href="${pageContext.request.contextPath}/transport/transport.jsp" class="func-btn">🚆 交通機関検索</a>
-            <a href="${pageContext.request.contextPath}/record/record.jsp" class="func-btn">📔 旅の記録</a>
-            <a href="${pageContext.request.contextPath}/route_search/route_search.jsp" class="func-btn">🗺️ ルート検索</a>
+            <a href="${pageContext.request.contextPath}/weather" class="func-btn">天気検索</a>
+            <a href="${pageContext.request.contextPath}/transport" class="func-btn">交通機関検索</a>
+            <a href="${pageContext.request.contextPath}/record" class="func-btn">旅の記録</a>
+            <a href="${pageContext.request.contextPath}/route_search" class="func-btn">ルート検索</a>
         </section>
 
         <section class="main-action">
-            <a href="${pageContext.request.contextPath}/create_plan/create_plan.jsp" class="create-plan-btn">プラン作成</a>
+            <a href="${pageContext.request.contextPath}/create_plan" class="create-plan-btn">プラン作成</a>
         </section>
     </main>
 
