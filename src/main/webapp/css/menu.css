@@ -1,23 +1,35 @@
 /* menu.css */
 
 .menu-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
     font-family: 'sans-serif';
+    /* ヘッダーの z-index より必ず低く（base.jspの定義に合わせる） */
+    position: relative;
+    z-index: 1;
 }
 
+.top-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    align-items: flex-start;
+}
+
+.plan-section { flex: 2.5; }
+.history-section { flex: 1; min-width: 180px; }
+
 .section-title {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #1d4ed8;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-weight: bold;
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-/* プランボックス：単色グレーからグラデーションで少し高級感を出す */
 .plan-box {
     background: linear-gradient(145deg, #e6e6e6, #cccccc);
     height: 220px;
@@ -27,53 +39,48 @@
     align-items: center;
     justify-content: center;
     border: 1px solid #bbb;
-    margin-bottom: 25px;
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
 }
 
-.no-plan-text {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #666; /* 少し色を落として落ち着かせる */
+.history-box {
+    background: #ffffff;
+    height: 220px;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.history-mini-list { list-style: none; padding: 0; margin: 0; }
+.history-mini-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.8rem;
+    color: #4b5563;
 }
 
 .function-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px; /* 少し広げる */
+    gap: 15px;
     margin-bottom: 30px;
 }
 
-/* 各ボタンにホバーエフェクトを追加 */
 .func-btn {
     background-color: #fff;
-    padding: 18px; /* 少し厚みを持たせる */
-    border-radius: 12px; /* 丸みを強く */
+    padding: 18px;
+    border-radius: 12px;
     text-align: center;
     text-decoration: none;
     color: #333;
     font-weight: bold;
     border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: all 0.2s ease; /* アニメーション */
 }
 
-.func-btn:hover {
-    transform: translateY(-2px); /* 浮き上がる */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border-color: #2563eb;
-    color: #2563eb;
-}
-
-.func-btn .icon {
-    font-size: 1.4rem;
-}
-
-/* メインボタンの調整 */
 .create-plan-btn {
     display: block;
     background: linear-gradient(to right, #2563eb, #1d4ed8);
@@ -84,11 +91,8 @@
     text-decoration: none;
     font-size: 1.2rem;
     font-weight: bold;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    transition: all 0.2s;
 }
 
-.create-plan-btn:hover {
-    transform: scale(1.02); /* 少し大きく */
-    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
+@media (max-width: 650px) {
+    .top-row { flex-direction: column; }
 }

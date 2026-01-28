@@ -25,7 +25,7 @@
     <a href="${pageContext.request.contextPath}/record/record.jsp" class="side-link">旅の記録</a>
 
     <div class="side-menu-footer">
-        <a href="${pageContext.request.contextPath}/menu/menu.jsp" class="btn-sidebar home">メニューへ戻る</a>
+        <a href="${pageContext.request.contextPath}/menu.jsp" class="btn-sidebar home">メニューへ戻る</a>
         <a href="${pageContext.request.contextPath}/logout" class="btn-sidebar logout">ログアウト</a>
     </div>
 </nav>
