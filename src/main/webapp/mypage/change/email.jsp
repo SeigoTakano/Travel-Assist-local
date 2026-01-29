@@ -10,27 +10,37 @@
 </head>
 <body>
     <div class="container">
-    <form action="<%= request.getContextPath() %>/EmailChangeServlet" method="post">
-    
         <h1>メールアドレスを変更</h1>
 
-        <div class="form-group">
-            <label>現在のメールアドレス</label>
-            <input type="text" name="currentEmail" 
-                   placeholder="メールアドレスを入力してください">
-        </div>
-        
-        <div class="form-group">
-            <label>新しいメールアドレス</label>
-            <input type="text" name="newEmail" 
-                   placeholder="新しいメールアドレスを入力してください">
-        </div>
+        <form action="<%= request.getContextPath() %>/EmailChangeServlet" method="post">
+            
+            <!-- 現在のメールアドレス -->
+            <div class="form-group">
+                <label>現在のメールアドレス</label>
+                <input type="text" name="currentEmail" 
+                       placeholder="現在のメールアドレスを入力してください"
+                       value="${currentEmailValue}">
+            </div>
 
-        <div class="button-area">
-            <button type="submit" class="change-btn">変更</button>
-            <button type="button" class="back-btn"
-                    onclick="history.back()">戻る</button>
-        </div>
+            <!-- 新しいメールアドレス -->
+            <div class="form-group">
+                <label>新しいメールアドレス</label>
+                <input type="text" name="newEmail" 
+                       placeholder="新しいメールアドレスを入力してください"
+                       value="${newEmailValue}">
+            </div>
+
+            <!-- エラーメッセージ -->
+            <c:if test="${not empty error}">
+                <div class="error-message">${error}</div>
+            </c:if>
+
+            <div class="button-area">
+                <button type="submit" class="change-btn">変更</button>
+                <button type="button" class="back-btn"
+                        onclick="history.back()">戻る</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>

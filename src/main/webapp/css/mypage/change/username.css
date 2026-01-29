@@ -56,13 +56,11 @@ input[readonly] {
     pointer-events: none;
 }
 
-/* 注意文 */
-.note {
-    font-size: 13px;
-    color: #e60000;
-    text-align: left;
-    margin-top: 6px;
-    line-height: 1.3;
+/* エラーメッセージを赤文字で表示 */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
 }
 
 /* ボタンエリア */

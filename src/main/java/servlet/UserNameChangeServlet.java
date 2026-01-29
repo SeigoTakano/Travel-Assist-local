@@ -14,13 +14,33 @@ import jakarta.servlet.http.HttpSession;
 public class UserNameChangeServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    // GET: 初回アクセス用
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            response.sendRedirect(request.getContextPath() + "/login/login.jsp");
+            return;
+        }
+
+        // 現在のユーザーネームを username にセット
+        String username = (String) session.getAttribute("username");
+        request.setAttribute("username", username);
+
+        request.getRequestDispatcher("/mypage/change/username.jsp").forward(request, response);
+    }
+
+    // POST: 送信時
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
-        if (session == null) {
+        if (session == null || session.getAttribute("username") == null) {
             response.sendRedirect(request.getContextPath() + "/login/login.jsp");
             return;
         }
@@ -28,24 +48,44 @@ public class UserNameChangeServlet extends HttpServlet {
         String currentUsername = (String) session.getAttribute("username");
         String newUsername = request.getParameter("newUsername");
 
-        if (newUsername == null || !newUsername.matches("[A-Za-z0-9_]+")) {
-            request.setAttribute("error", "ユーザーネームは英数字とアンダースコアのみです。");
-            request.getRequestDispatcher("/mypage/change/username.jsp").forward(request, response);
+        // ① null または空文字チェック（最優先）
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            setErrorAndForward(request, response, "新しいユーザーネームを入力してください。", currentUsername, "");
             return;
         }
 
-        // DB更新処理
+        newUsername = newUsername.trim();
+
+        // ② 現在と同じ名前チェック
+        if (currentUsername.equalsIgnoreCase(newUsername)) {
+            setErrorAndForward(request, response, "現在のユーザーネームと同じです。変更してください。", currentUsername, newUsername);
+            return;
+        }
+
+        // ③ 英数字とアンダースコアのみチェック
+        if (!newUsername.matches("[A-Za-z0-9_]+")) {
+            setErrorAndForward(request, response, "ユーザーネームは英数字とアンダースコアのみです。", currentUsername, newUsername);
+            return;
+        }
+
+        // ④ DB更新
         UserDao dao = new UserDao();
         boolean updated = dao.updateUsername(currentUsername, newUsername);
 
         if (updated) {
-            // Session の username も更新
             session.setAttribute("username", newUsername);
-            // 更新後は profile.jsp にリダイレクト
             response.sendRedirect(request.getContextPath() + "/profile");
         } else {
-            request.setAttribute("error", "ユーザーネームの更新に失敗しました。");
-            request.getRequestDispatcher("/mypage/change/username.jsp").forward(request, response);
+            setErrorAndForward(request, response, "ユーザーネームの更新に失敗しました。", currentUsername, newUsername);
         }
+    }
+
+    private void setErrorAndForward(HttpServletRequest request, HttpServletResponse response,
+                                    String message, String currentUsername, String newUsername)
+            throws ServletException, IOException {
+        request.setAttribute("error", message);
+        request.setAttribute("username", currentUsername); // 現在のユーザーネーム
+        request.setAttribute("newUsernameValue", newUsername); // 新しいユーザーネーム入力値
+        request.getRequestDispatcher("/mypage/change/username.jsp").forward(request, response);
     }
 }
