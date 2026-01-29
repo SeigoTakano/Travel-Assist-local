@@ -84,7 +84,7 @@
         <section class="function-grid">
             <a href="${pageContext.request.contextPath}/weather" class="func-btn">天気検索</a>
             <a href="${pageContext.request.contextPath}/transport" class="func-btn">交通機関検索</a>
-            <a href="${pageContext.request.contextPath}/create_post" class="func-btn">旅の記録</a>
+            <a href="${pageContext.request.contextPath}/read_post" class="func-btn">旅の記録</a>
             <a href="${pageContext.request.contextPath}/route_search" class="func-btn">ルート検索</a>
         </section>
 

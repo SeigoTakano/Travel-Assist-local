@@ -12,7 +12,7 @@ import bean.Post;
 
 public class PostDao {
 
-    // 投稿一覧をすべて取得
+    // 投稿一覧をすべて取得（新しい順）
     public List<Post> findAll() {
         List<Post> postList = new ArrayList<>();
         String sql = "SELECT * FROM post ORDER BY post_number DESC";
@@ -40,7 +40,6 @@ public class PostDao {
 
     // 新規投稿を保存
     public boolean create(Post post) {
-        // create_date, update_date は NOW() で自動入力
         String sql = "INSERT INTO post (title, impression, username, imagepass, post_date, create_date, create_user, update_date, update_user) " +
                      "VALUES (?, ?, ?, ?, CURDATE(), NOW(), ?, NOW(), ?)";
 
@@ -51,11 +50,29 @@ public class PostDao {
             pStmt.setString(2, post.getImpression());
             pStmt.setString(3, post.getUsername());
             pStmt.setString(4, post.getImagepass());
-            pStmt.setString(5, post.getCreateUser()); // 作成者
-            pStmt.setString(6, post.getUpdateUser()); // 更新者
+            pStmt.setString(5, post.getCreateUser());
+            pStmt.setString(6, post.getUpdateUser());
 
             int result = pStmt.executeUpdate();
             return (result == 1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ★追加：投稿を削除する
+    public boolean delete(int postNumber) {
+        String sql = "DELETE FROM post WHERE post_number = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pStmt = conn.prepareStatement(sql)) {
+
+            pStmt.setInt(1, postNumber);
+
+            int result = pStmt.executeUpdate();
+            // 削除された行数が1以上なら成功
+            return (result >= 1);
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

@@ -18,21 +18,41 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ReadPostServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    // --- 既存の読み込み処理 (GET) ---
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // DAOで投稿一覧を取得
         PostDao dao = new PostDao();
         List<Post> postList = dao.findAll();
         
-        // JSON形式でレスポンスを返す設定
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         
-        // GsonライブラリでリストをJSON文字列に変換
         PrintWriter out = response.getWriter();
         Gson gson = new Gson();
         out.print(gson.toJson(postList));
+        out.flush();
+    }
+
+    // --- ★追記：削除処理 (POST) ---
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        // JSのbodyで送られてきた "postNumber" を取得
+        String postNumStr = request.getParameter("postNumber");
+        boolean success = false;
+
+        if (postNumStr != null) {
+            int postNumber = Integer.parseInt(postNumStr);
+            PostDao dao = new PostDao();
+            success = dao.delete(postNumber); // DAOにdeleteメソッドが必要です
+        }
+
+        // 結果をテキストで返す
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(success ? "success" : "fail");
         out.flush();
     }
 }

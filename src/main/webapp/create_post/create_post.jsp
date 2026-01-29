@@ -45,7 +45,7 @@
           <div class="text-area">
             <label for="impression">感想（200文字以内）</label>
             <%-- ★maxlengthで文字数制限、requiredで必須入力に --%>
-            <textarea id="impression" name="comment" placeholder="旅の思い出をここに!" required maxlength="200"></textarea>
+            <textarea id="impression" name="comment" placeholder="旅の思い出をここに" required maxlength="200"></textarea>
           </div>
         </div>
 

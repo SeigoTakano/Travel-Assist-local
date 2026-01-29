@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         const contextPath = "${pageContext.request.contextPath}";
+        // ★セッションからログイン中のユーザー名を取得（JS変数として保持）
+        const loginUser = "<%= session.getAttribute("username") %>";
     </script>
 </head>
 <body>
