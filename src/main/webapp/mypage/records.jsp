@@ -67,7 +67,7 @@
             <div class="icon-circle">
                 <i class="fas fa-folder-open"></i>
             </div>
-            <h4>作成済みプランがありません</h4>
+            <h4>作成済み記録がありません</h4>
         </div>
     </c:if>
     
