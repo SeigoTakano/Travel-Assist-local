@@ -1,0 +1,82 @@
+@charset "UTF-8";
+
+/* ===== メイン ===== */
+.main {
+    padding: 30px 40px;
+}
+
+/* ===== ユーザー情報テーブル ===== */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.user-table th {
+    background: #8ec6f0;
+    color: #000;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.user-table td {
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid #ddd;
+}
+
+/* ===== 削除ボタン ===== */
+.delete-btn {
+    padding: 4px 12px;
+    background: #fff;
+    border: 1px solid #f08080;
+    color: #f08080;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background: #ffecec;
+}
+
+/* ===== 投稿枠 ===== */
+.post-box {
+    margin-top: 30px;
+    border: 1px solid #8ec6f0;
+    background: #fff;
+}
+
+/* 投稿ヘッダー */
+.post-header {
+    background: #8ec6f0;
+    color: #000;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* 投稿中身 */
+.post-content {
+    padding: 30px;
+    min-height: 150px;
+}
+
+/* 投稿なし */
+.no-post {
+    text-align: center;
+    color: #888;
+}
+
+/* 投稿リスト */
+.post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.post-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}

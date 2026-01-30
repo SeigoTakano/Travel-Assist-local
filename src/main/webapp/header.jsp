@@ -22,7 +22,7 @@
     <a href="${pageContext.request.contextPath}/route_search" class="side-link">ルート検索</a>
     <a href="${pageContext.request.contextPath}/transport" class="side-link">交通機関検索</a>
     <a href="${pageContext.request.contextPath}/weather" class="side-link">天気検索</a>
-    <a href="${pageContext.request.contextPath}/create_post" class="side-link">旅の記録</a>
+    <a href="${pageContext.request.contextPath}/read_post" class="side-link">旅の記録</a>
 
     <div class="side-menu-footer">
         <a href="${pageContext.request.contextPath}/menu" class="btn-sidebar home">メニューへ戻る</a>

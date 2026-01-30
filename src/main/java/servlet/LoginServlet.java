@@ -23,27 +23,23 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         
         LoginDao dao = new LoginDao();
-        // DBからユーザー情報を取得
         User user = dao.login(email, password);
 
         if (user != null) {
             HttpSession session = request.getSession();
             
-            // ★【ここが重要】Userオブジェクトをまるごとセッションに保存
-            // これにより、RouteServletで (User) session.getAttribute("loginUser") が使えるようになります
+            // Userオブジェクトをまるごと保存（フラグ情報も含まれている）
             session.setAttribute("loginUser", user); 
             
-            // 念のため、既存の個別データも残しておきます
+            // 個別データも保持
             session.setAttribute("userId", user.getId()); 
             session.setAttribute("username", user.getUsername());
             
-            // ★【重要】リダイレクト先を menu.jsp ではなくサーブレットの "/menu" に変更
-            // これで MenuServlet が走り、最新の検索履歴が取得された状態でメニュー画面が開きます
+            // ★ メニュー用のサーブレットへリダイレクト
             response.sendRedirect(request.getContextPath() + "/menu"); 
             
         } else {
             request.setAttribute("error", "メールアドレス、またはパスワードが正しくありません。");
-            // パスはプロジェクト構成に合わせて調整してください
             request.getRequestDispatcher("login/login.jsp").forward(request, response);
         }
     }
