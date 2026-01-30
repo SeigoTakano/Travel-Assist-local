@@ -157,3 +157,17 @@ body {
     filter: brightness(1.1);
     transform: translateX(8px);
 }
+
+/* header.css の末尾にこれを追加してください */
+.top-header {
+    z-index: 9998 !important; /* ヘッダー本体 */
+}
+
+.hamburger {
+    z-index: 10000 !important; /* ハンバーガーボタン（最優先） */
+    pointer-events: auto !important; /* クリックを強制有効 */
+}
+
+.side-menu {
+    z-index: 9999 !important; /* サイドメニュー本体 */
+}

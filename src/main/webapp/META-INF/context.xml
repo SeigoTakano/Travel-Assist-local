@@ -4,7 +4,7 @@
               auth="Container"
               type="javax.sql.DataSource"
               driverClassName="com.mysql.cj.jdbc.Driver"
-              url="jdbc:mysql://localhost:3306/travelassist?useSSL=false&amp;serverTimezone=Asia/Tokyo"
+              url="jdbc:mysql://localhost:3306/travelassist?useSSL=false&amp;serverTimezone=Asia/Tokyo&amp;useUnicode=true&amp;characterEncoding=utf8&amp;allowPublicKeyRetrieval=true"
               username="root"
               password="travelassist"
               maxTotal="20"

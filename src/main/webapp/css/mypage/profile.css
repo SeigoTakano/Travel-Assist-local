@@ -15,6 +15,78 @@ body {
     padding: 28px 0 16px;
 }
 
+/* ハンバーガーボタン */
+.hamburger-container {
+    padding: 10px 20px;
+}
+
+.hamburger {
+    width: 70px;
+    height: 70px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.hamburger span {
+    width: 40px;
+    height: 4px;
+    background: white;
+    transition: 0.3s;
+}
+
+/* ハンバーガーが × に変形 */
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* サイドメニュー */
+.side-nav {
+    position: fixed;
+    top: 0;
+    left: -240px;
+    width: 240px;
+    height: 100vh;
+    background: #3b82f6;
+    transition: left 0.3s;
+    padding-top: 60px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.side-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    font-weight: bold;
+    text-align: center;
+}
+
+/* サイドメニュー表示 */
+.side-nav.show {
+    left: 0;
+}
+
+/* JSで付与されるクラス */
+.side-nav.open {
+    left: 0;
+}
+
 .site-title {
   margin: 0;
   font-size: 28px;

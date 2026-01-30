@@ -23,20 +23,23 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         
         LoginDao dao = new LoginDao();
-        // 戻り値をUser型で受け取る
         User user = dao.login(email, password);
 
         if (user != null) {
             HttpSession session = request.getSession();
-            // IDと名前を両方セッションに保存
+            
+            // Userオブジェクトをまるごと保存（フラグ情報も含まれている）
+            session.setAttribute("loginUser", user); 
+            
+            // 個別データも保持
             session.setAttribute("userId", user.getId()); 
             session.setAttribute("username", user.getUsername());
             
-            // ログイン成功時はメニューへ
-            response.sendRedirect("menu.jsp"); 
+            // ★ メニュー用のサーブレットへリダイレクト
+            response.sendRedirect(request.getContextPath() + "/menu"); 
+            
         } else {
             request.setAttribute("error", "メールアドレス、またはパスワードが正しくありません。");
-            // login.jspがwebapp/login/フォルダ内にある場合のパス
             request.getRequestDispatcher("login/login.jsp").forward(request, response);
         }
     }

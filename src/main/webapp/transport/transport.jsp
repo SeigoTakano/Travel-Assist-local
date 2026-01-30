@@ -7,7 +7,7 @@
     <title>交通機関比較検索</title>
     
     <%@ include file="../base.jsp" %>
-    <link rel="stylesheet" href="../css/transport.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/transport.css">
 </head>
 <body>
 
@@ -66,8 +66,12 @@
             <div id="resultContent" class="comparison-grid"></div>
         </section>
     </div>
+    
+    <script>
+    	const contextPath = "${pageContext.request.contextPath}";
+	</script>
 
-    <script src="../js/transport.js" defer></script>
+    <script src="${pageContext.request.contextPath}/js/transport.js" defer></script>
 
 </body>
 </html>

@@ -18,6 +18,27 @@
 	</nav>
 </header>
 
+<!-- ヘッダー直下のハンバーガー -->
+<div class="hamburger-container">
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<!-- ナビゲーションメニュー -->
+<nav class="side-nav" id="side-menu">
+    <a class="tab" href="${pageContext.request.contextPath}/create_plan/create_plan.jsp">プラン作成</a>
+    <a class="tab" href="${pageContext.request.contextPath}/route_search/route_search.jsp">ルート検索</a>
+    <a class="tab" href="${pageContext.request.contextPath}/transport/transport.jsp">交通機関検索</a>
+    <a class="tab" href="${pageContext.request.contextPath}/weather/weather.jsp">天気検索</a>
+    <a class="tab" href="${pageContext.request.contextPath}/record/record.jsp">旅の記録</a>
+    <a class="tab" href="${pageContext.request.contextPath}/menu.jsp">メニューへ</a>
+    <a class="tab" href="<%= request.getContextPath() %>/inquiry">お問い合わせ</a>
+    <a class="tab" href="<%= request.getContextPath() %>/logout">ログアウト</a>
+</nav>
+
 <main class="container">
     <section class="profile-section">
         <h2>プロフィール</h2>
@@ -43,6 +64,8 @@
     			class="btn-password">パスワード変更</a>
 		</div>
     </section>
+    
+    <script src="${pageContext.request.contextPath}/js/header.js" defer></script>
 </main>
 </body>
 </html>
