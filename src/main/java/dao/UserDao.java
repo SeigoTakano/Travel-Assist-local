@@ -110,83 +110,47 @@ public class UserDao {
         return false;
     }
     
-    // username をもとにユーザー情報を取得する
-    public User getUserByUsername(String username) {
-        String sql = "SELECT id, email, password, username FROM users WHERE username = ? AND user_del IS NULL";
-
+ // username 更新（ID基準）
+    public boolean updateUsernameById(int id, String username) {
+        String sql = "UPDATE users SET username=? WHERE id=? AND user_del IS NULL";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, username);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return new User(
-                        rs.getInt("id"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("username")
-                    );
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-    
-    // username を更新する
-    public boolean updateUsername(String currentUsername, String newUsername) {
-        String sql = "UPDATE users SET username = ? WHERE username = ? AND user_del IS NULL";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, newUsername);
-            pstmt.setString(2, currentUsername);
-
-            int rows = pstmt.executeUpdate();
-            return rows > 0;
+            pstmt.setInt(2, id);
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
-    
-    // username をキーに email を更新する
-    public boolean updateEmailByUsername(String username, String newEmail) {
-        String sql = "UPDATE users SET email = ? WHERE username = ? AND user_del IS NULL";
 
+    // email 更新（ID基準）
+    public boolean updateEmailById(int id, String email) {
+        String sql = "UPDATE users SET email=? WHERE id=? AND user_del IS NULL";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, newEmail);
-            pstmt.setString(2, username);
-
-            int rows = pstmt.executeUpdate();
-            return rows > 0;
+            pstmt.setString(1, email);
+            pstmt.setInt(2, id);
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
-    
-    // username をキーに password を更新する
-    public boolean updatePasswordByUsername(String username, String newPassword) {
-        String sql = "UPDATE users SET password = ? WHERE username = ? AND user_del IS NULL";
 
+    // password 更新（ID基準）
+    public boolean updatePasswordById(int id, String password) {
+        String sql = "UPDATE users SET password=? WHERE id=? AND user_del IS NULL";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, newPassword);
-            pstmt.setString(2, username);
-
-            int rows = pstmt.executeUpdate();
-            return rows > 0;
+            pstmt.setString(1, password);
+            pstmt.setInt(2, id);
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();

@@ -35,7 +35,8 @@
             <!-- ボタン -->
             <div class="button-area">
                 <button type="submit" class="btn save">変更</button>
-                <button type="button" class="btn cancel" onclick="history.back()">戻る</button>
+                <button type="button" class="btn cancel"
+                	onclick="location.href='<%= request.getContextPath() %>/profile'">戻る</button>
             </div>
         </form>
     </div>

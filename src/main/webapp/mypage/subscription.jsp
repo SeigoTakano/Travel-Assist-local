@@ -41,7 +41,7 @@
     <a class="tab" href="${pageContext.request.contextPath}/route_search/route_search.jsp">ルート検索</a>
     <a class="tab" href="${pageContext.request.contextPath}/transport/transport.jsp">交通機関検索</a>
     <a class="tab" href="${pageContext.request.contextPath}/weather/weather.jsp">天気検索</a>
-    <a class="tab" href="${pageContext.request.contextPath}/record/record.jsp">旅の記録</a>
+    <a class="tab" href="${pageContext.request.contextPath}/create_post" class="side-link">旅の記録</a>
     <a class="tab" href="${pageContext.request.contextPath}/menu.jsp">メニューへ</a>
     <a class="tab" href="<%= request.getContextPath() %>/inquiry">お問い合わせ</a>
     <a class="tab" href="<%= request.getContextPath() %>/logout">ログアウト</a>

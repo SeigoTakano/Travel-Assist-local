@@ -61,4 +61,32 @@ public class PostDao {
             return false;
         }
     }
+    
+    // ログインユーザーの投稿のみ取得
+    public List<Post> findByUsername(String username) {
+        List<Post> postList = new ArrayList<>();
+        String sql = "SELECT * FROM post WHERE username = ? ORDER BY post_number DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pStmt = conn.prepareStatement(sql)) {
+
+            pStmt.setString(1, username);
+            ResultSet rs = pStmt.executeQuery();
+
+            while (rs.next()) {
+                Post post = new Post();
+                post.setPostNumber(rs.getInt("post_number"));
+                post.setTitle(rs.getString("title"));
+                post.setImpression(rs.getString("impression"));
+                post.setUsername(rs.getString("username"));
+                post.setImagepass(rs.getString("imagepass"));
+                post.setPostDate(rs.getDate("post_date"));
+                postList.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return postList;
+    }
+
 }

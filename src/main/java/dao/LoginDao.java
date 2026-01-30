@@ -19,7 +19,7 @@ public class LoginDao {
      * ログイン認証を行い、成功した場合はUserオブジェクトを返します。
      */
     public User login(String email, String password) {
-        String sql = "SELECT id, username FROM users WHERE email = ? AND password = ? AND user_del IS NULL";
+        String sql = "SELECT id, username, email FROM users WHERE email = ? AND password = ? AND user_del IS NULL";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -33,6 +33,7 @@ public class LoginDao {
                     User user = new User();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
                     return user;
                 }
             }
