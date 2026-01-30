@@ -60,7 +60,6 @@ public class PostDao {
             return false;
         }
     }
-<<<<<<< HEAD
     
     // ログインユーザーの投稿のみ取得
     public List<Post> findByUsername(String username) {
@@ -89,8 +88,6 @@ public class PostDao {
         return postList;
     }
 
-=======
-
     // ★追加：投稿を削除する
     public boolean delete(int postNumber) {
         String sql = "DELETE FROM post WHERE post_number = ?";
@@ -108,5 +105,4 @@ public class PostDao {
             return false;
         }
     }
->>>>>>> branch 'master' of https://github.com/SeigoTakano/Travel-Assist-local.git
 }
