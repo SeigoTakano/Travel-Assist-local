@@ -1,7 +1,7 @@
 package bean;
  
 import java.io.Serializable;
-
+ 
 public class User implements Serializable {
     private int id;
     private String email;
@@ -9,9 +9,9 @@ public class User implements Serializable {
     private String username;
     private boolean managerFlag; // 1なら管理者
     private boolean adminFlag;   // managerFlagと両方1ならスーパー管理者
-
+ 
     public User() {}
-    
+ 
     public User(int id, String email, String password, String username, boolean managerFlag, boolean adminFlag) {
         this.id = id;
         this.email = email;
@@ -20,16 +20,7 @@ public class User implements Serializable {
         this.managerFlag = managerFlag;
         this.adminFlag = adminFlag;
     }
-    
-    public User(int id, String email, String password, String username) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.username = username;
-        this.managerFlag = false;
-        this.adminFlag = false;
-    }
-
+ 
     // Getter & Setter
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -44,3 +35,4 @@ public class User implements Serializable {
     public boolean isAdminFlag() { return adminFlag; }
     public void setAdminFlag(boolean adminFlag) { this.adminFlag = adminFlag; }
 }
+ 

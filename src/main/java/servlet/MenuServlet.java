@@ -38,7 +38,7 @@ public class MenuServlet extends HttpServlet {
         } 
         else if (loginUser.isManagerFlag()) {
             // 一般管理者 (managerのみ1)
-            request.getRequestDispatcher("/admin_menu.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin_menu/admin_menu.jsp").forward(request, response);
         } 
         else {
             // 一般ユーザー

@@ -1,11 +1,13 @@
 package dao;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import DBConnection.DBConnection;
@@ -13,328 +15,123 @@ import bean.User;
 
 public class UserDao {
 
-    // データ取得（全件）
-    public List<User> getAllUsers() {
-        List<User> list = new ArrayList<>();
-        String sql = "SELECT id, email, password, username FROM users WHERE user_del IS NULL";
-
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                User user = new User(
-                    rs.getInt("id"),
-                    rs.getString("email"),
-                    rs.getString("password"),
-                    rs.getString("username")
-                );
-                list.add(user);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    // データ取得（IDで検索）
-    public User getUserById(int id) {
-        String sql = "SELECT id, email, password, username FROM users WHERE id = ?";
+    // 1. ログイン (LoginDaoと共通のハッシュ化ロジックを使用)
+    public User login(String email, String password) {
+        String sql = "SELECT id, email, password, username, manager_flag, admin_flag FROM users " +
+                     "WHERE email = ? AND password = ? AND user_del IS NULL";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, id);
+            pstmt.setString(1, email);
+            pstmt.setString(2, hashPassword(password)); // ハッシュ化して比較
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return new User(
-                        rs.getInt("id"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("username")
+                        rs.getInt("id"), rs.getString("email"), rs.getString("password"),
+                        rs.getString("username"), rs.getBoolean("manager_flag"), rs.getBoolean("admin_flag")
                     );
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return null;
     }
 
-    // データ追加
+    // 2. 全ユーザー取得 (管理者画面用)
+    public List<User> getAllUsers() {
+        List<User> list = new ArrayList<>();
+        String sql = "SELECT id, email, password, username, manager_flag, admin_flag FROM users WHERE user_del IS NULL";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(new User(
+                    rs.getInt("id"), rs.getString("email"), rs.getString("password"),
+                    rs.getString("username"), rs.getBoolean("manager_flag"), rs.getBoolean("admin_flag")
+                ));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    // 3. パスワード更新 (ハッシュ化対応 + update_date更新)
+    public boolean updatePasswordByUsername(String username, String newPassword) {
+        String sql = "UPDATE users SET password = ?, update_date = NOW(), update_user = ? WHERE username = ? AND user_del IS NULL";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, hashPassword(newPassword)); // ハッシュ化して保存
+            pstmt.setString(2, username);
+            pstmt.setString(3, username);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    // 4. メールアドレス更新
+    public boolean updateEmailByUsername(String username, String newEmail) {
+        String sql = "UPDATE users SET email = ?, update_date = NOW(), update_user = ? WHERE username = ? AND user_del IS NULL";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newEmail);
+            pstmt.setString(2, username);
+            pstmt.setString(3, username);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    // 5. ユーザー名更新
+    public boolean updateUsername(String currentUsername, String newUsername) {
+        String sql = "UPDATE users SET username = ?, update_date = NOW(), update_user = ? WHERE username = ? AND user_del IS NULL";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newUsername);
+            pstmt.setString(2, currentUsername);
+            pstmt.setString(3, currentUsername);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    // 6. 新規登録 (ハッシュ化 + 全カラム網羅)
     public boolean addUser(User user) {
-        String sql = "INSERT INTO users(email, password, username) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO users(" +
+                     "email, password, username, manager_flag, admin_flag, " +
+                     "create_date, create_user, update_date, update_user" +
+                     ") VALUES(?, ?, ?, 0, 0, NOW(), ?, NOW(), ?)";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, user.getEmail());
-            pstmt.setString(2, user.getPassword());
+            pstmt.setString(2, hashPassword(user.getPassword())); // ハッシュ化
             pstmt.setString(3, user.getUsername());
+            pstmt.setString(4, user.getUsername()); // create_user
+            pstmt.setString(5, user.getUsername()); // update_user
+            
             return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return false;
     }
 
-    // データ更新
-    public boolean updateUser(User user) {
-        String sql = "UPDATE users SET email=?, password=?, username=? WHERE id=?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, user.getEmail());
-            pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getUsername());
-            pstmt.setInt(4, user.getId());
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // データ削除
+    // 7. ユーザー削除 (物理削除)
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setInt(1, id);
             return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
- // username 更新（ID基準）
-    public boolean updateUsernameById(int id, String username) {
-        String sql = "UPDATE users SET username=? WHERE id=? AND user_del IS NULL";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, username);
-            pstmt.setInt(2, id);
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return false;
     }
 
-    // email 更新（ID基準）
-    public boolean updateEmailById(int id, String email) {
-        String sql = "UPDATE users SET email=? WHERE id=? AND user_del IS NULL";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, email);
-            pstmt.setInt(2, id);
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+    // 共通メソッド: パスワードハッシュ化
+    private String hashPassword(String password) {
+        if (password == null || password.isEmpty()) return "";
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("ハッシュ化に失敗しました", e);
         }
-        return false;
-    }
-
-    // password 更新（ID基準）
-    public boolean updatePasswordById(int id, String password) {
-        String sql = "UPDATE users SET password=? WHERE id=? AND user_del IS NULL";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, password);
-            pstmt.setInt(2, id);
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
-    // 検索（ID / email / username の部分一致）
-    public List<User> searchUsers(String keyword) {
-        List<User> list = new ArrayList<>();
- 
-        String sql =
-        	"SELECT id, email, password, username, manager_flag, admin_flag " +
-            "FROM users " +
-            "WHERE user_del IS NULL " +
-            "AND (" +
-            "CAST(id AS CHAR) LIKE ? " +
-            "OR email LIKE ? " +
-            "OR username LIKE ?" +
-            ")";
- 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
- 
-            String like = "%" + keyword + "%";
-            pstmt.setString(1, like);
-            pstmt.setString(2, like);
-            pstmt.setString(3, like);
- 
-            ResultSet rs = pstmt.executeQuery();
- 
-            while (rs.next()) {
-                list.add(new User(
-                    rs.getInt("id"),
-                    rs.getString("email"),
-                    rs.getString("password"),
-                    rs.getString("username"),
-                    rs.getBoolean("manager_flag"),
-                    rs.getBoolean("admin_flag")
-                ));
-            }
- 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
- 
-        return list;
-    }
-    
-    
-    
-    // 管理者のみ取得
-    public List<User> getManagerUsers() {
-        List<User> list = new ArrayList<>();
- 
-        String sql =
-            "SELECT id, email, password, username, manager_flag, admin_flag " +
-            "FROM users " +
-            "WHERE user_del IS NULL AND manager_flag = 1";
- 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
- 
-            while (rs.next()) {
-                User user = new User(
-                    rs.getInt("id"),
-                    rs.getString("email"),
-                    rs.getString("password"),
-                    rs.getString("username"),                    
-                    rs.getBoolean("manager_flag"),
-                    rs.getBoolean("admin_flag")
-                    );
-                list.add(user);
-            }
- 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-    
-// 管理者検索
-    public List<User> searchManagerUsers(String keyword) {
-        List<User> list = new ArrayList<>();
- 
-        String sql =
-            "SELECT id, email, password, username, manager_flag, admin_flag " +
-            "FROM users " +
-            "WHERE user_del IS NULL " +
-            "AND manager_flag = 1 " +
-            "AND (" +
-            "CAST(id AS CHAR) LIKE ? " +
-            "OR email LIKE ? " +
-            "OR username LIKE ?" +
-            ")";
- 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
- 
-            String like = "%" + keyword + "%";
-            pstmt.setString(1, like);
-            pstmt.setString(2, like);
-            pstmt.setString(3, like);
- 
-            ResultSet rs = pstmt.executeQuery();
- 
-            while (rs.next()) {
-                list.add(new User(
-                    rs.getInt("id"),
-                    rs.getString("email"),
-                    rs.getString("password"),
-                    rs.getString("username"),
-                    rs.getBoolean("manager_flag"),
-                    rs.getBoolean("admin_flag")
-                    ));
-            }
- 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-    
-    
-// username をもとにユーザー情報を取得する
-    public User getUserByUsername(String username) {
-        String sql = "SELECT id, email, password, username, manager_flag, admin_flag FROM users WHERE username = ? AND user_del IS NULL";
- 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
- 
-            pstmt.setString(1, username);
- 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return new User(
-                        rs.getInt("id"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("username"),
-                        rs.getBoolean("manager_flag"),
-                        rs.getBoolean("admin_flag")
-                    );
-                }
-            }
- 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
- 
-        return null;
-    }
-    
-    
-    public User findById(int userId) {
- 
-        User user = null;
- 
-        String sql = "SELECT id, email,password, username, manager_flag, admin_flag FROM users WHERE id = ?";
- 
-        try (Connection conn = DBConnection.getConnection();
- 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
- 
-            ps.setInt(1, userId);
- 
-            ResultSet rs = ps.executeQuery();
- 
-            if (rs.next()) {
-                user = new User(
-                        rs.getInt("id"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("username"),
-                        rs.getBoolean("manager_flag"),
-                        rs.getBoolean("admin_flag")
-                );
-            }
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
- 
-        return user;
     }
 }

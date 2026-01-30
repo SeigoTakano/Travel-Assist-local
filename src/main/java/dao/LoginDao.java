@@ -16,25 +16,30 @@ import bean.User;
 public class LoginDao {
 
     /**
-     * ログイン認証を行い、成功した場合はUserオブジェクトを返します。
+     * ログイン認証を行い、成功した場合はフラグ情報を含めたUserオブジェクトを返します。
      */
     public User login(String email, String password) {
-        String sql = "SELECT id, username, email FROM users WHERE email = ? AND password = ? AND user_del IS NULL";
+        // ★重要: manager_flag と admin_flag も取得するように変更
+        String sql = "SELECT id, email, password, username, manager_flag, admin_flag FROM users " +
+                     "WHERE email = ? AND password = ? AND user_del IS NULL";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, email);
-            // 入力されたパスワードをハッシュ化してDBと比較
             pstmt.setString(2, hashPassword(password));
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    User user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setEmail(rs.getString("email"));
-                    return user;
+                    // ★Beanのコンストラクタ（引数6個版）を使って全ての情報を返す
+                    return new User(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("username"),
+                        rs.getBoolean("manager_flag"),
+                        rs.getBoolean("admin_flag")
+                    );
                 }
             }
         } catch (Exception e) {
@@ -47,7 +52,8 @@ public class LoginDao {
      * メールアドレスの重複チェック
      */
     public boolean isEmailExists(String email) {
-        String sql = "SELECT id FROM users WHERE email = ?";
+        // user_delがNULL（有効なユーザー）の中から探す
+        String sql = "SELECT id FROM users WHERE email = ? AND user_del IS NULL";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
@@ -61,19 +67,21 @@ public class LoginDao {
     }
 
     /**
-     * ユーザーを新規登録（パスワードをハッシュ化して保存）
+     * ユーザーを新規登録（フラグの初期値と日付カラムを網羅）
      */
     public boolean registerUser(String username, String email, String password) {
-        String sql = "INSERT INTO users (username, email, password, create_user, update_user) VALUES (?, ?, ?, ?, ?)";
+        // テーブル構造に合わせて、manager_flag(0), admin_flag(0), 日付系を全てセット
+        String sql = "INSERT INTO users (username, email, password, manager_flag, admin_flag, " +
+                     "create_date, create_user, update_date, update_user) " +
+                     "VALUES (?, ?, ?, 0, 0, NOW(), ?, NOW(), ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, username);
             pstmt.setString(2, email);
-            // パスワードをハッシュ化
             pstmt.setString(3, hashPassword(password));
-            pstmt.setString(4, username);
-            pstmt.setString(5, username);
+            pstmt.setString(4, username); // create_user
+            pstmt.setString(5, username); // update_user
             
             return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
@@ -86,7 +94,8 @@ public class LoginDao {
      * パスワード更新（ハッシュ化して更新）
      */
     public boolean updatePassword(String email, String newPassword) {
-        String sql = "UPDATE users SET password = ?, update_date = CURRENT_TIMESTAMP, update_user = ? WHERE email = ? AND user_del IS NULL";
+        String sql = "UPDATE users SET password = ?, update_date = CURRENT_TIMESTAMP, update_user = ? " +
+                     "WHERE email = ? AND user_del IS NULL";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -102,9 +111,9 @@ public class LoginDao {
     }
 
     /**
-     * パスワードをSHA-256でハッシュ化し、Base64形式の文字列で返す内部メソッド
+     * パスワードをSHA-256でハッシュ化
      */
-    private String hashPassword(String password) {
+    public String hashPassword(String password) {
         if (password == null || password.isEmpty()) {
             return "";
         }
