@@ -23,7 +23,7 @@
 <form action="../user_info_list/user_info_list.jsp" method="get">
 <button type="submit">ユーザー情報一覧</button>
 </form>
-<form action="${pageContext.request.contextPath}/admin/post" method="get">
+<form action="../post_manage/post_manage.jsp" method="get">
 <button>投稿管理</button>
 </form>
 </div>

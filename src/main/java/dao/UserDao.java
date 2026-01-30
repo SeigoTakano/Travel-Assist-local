@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,101 +13,349 @@ import bean.User;
 
 public class UserDao {
 
-    // 1. ログイン (管理者・マネージャーフラグ取得)
-    public User login(String email, String password) {
-        String sql = "SELECT id, email, password, username, manager_flag, admin_flag FROM users " +
-                     "WHERE email = ? AND password = ? AND user_del IS NULL";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return new User(
-                        rs.getInt("id"), rs.getString("email"), rs.getString("password"),
-                        rs.getString("username"), rs.getBoolean("manager_flag"), rs.getBoolean("admin_flag")
-                    );
-                }
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return null;
-    }
-
-    // 2. 全ユーザー取得 (フラグ込み)
+    // データ取得（全件）
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT id, email, password, username, manager_flag, admin_flag FROM users";
+        String sql = "SELECT id, email, password, username FROM users WHERE user_del IS NULL";
+
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
-                list.add(new User(
-                    rs.getInt("id"), rs.getString("email"), rs.getString("password"),
-                    rs.getString("username"), rs.getBoolean("manager_flag"), rs.getBoolean("admin_flag")
-                ));
+                User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getString("username")
+                );
+                list.add(user);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
-    // 3. パスワード更新
-    public boolean updatePasswordByUsername(String username, String newPassword) {
-        String sql = "UPDATE users SET password = ? WHERE username = ? AND user_del IS NULL";
+    // データ取得（IDで検索）
+    public User getUserById(int id) {
+        String sql = "SELECT id, email, password, username FROM users WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, newPassword);
-            pstmt.setString(2, username);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
-        return false;
+
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("username")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    // 4. メールアドレス更新 (★EmailChangeServletのために追加)
-    public boolean updateEmailByUsername(String username, String newEmail) {
-        String sql = "UPDATE users SET email = ? WHERE username = ? AND user_del IS NULL";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, newEmail);
-            pstmt.setString(2, username);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
-        return false;
-    }
-
-    // 5. ユーザー名更新 (プロフィール編集用などに)
-    public boolean updateUsername(String currentUsername, String newUsername) {
-        String sql = "UPDATE users SET username = ? WHERE username = ? AND user_del IS NULL";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, newUsername);
-            pstmt.setString(2, currentUsername);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
-        return false;
-    }
-
-    // 6. 新規登録 (初期値は一般ユーザー)
+    // データ追加
     public boolean addUser(User user) {
-        String sql = "INSERT INTO users(email, password, username, manager_flag, admin_flag, create_date) " +
-                     "VALUES(?, ?, ?, 0, 0, NOW())";
+        String sql = "INSERT INTO users(email, password, username) VALUES(?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, user.getEmail());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getUsername());
             return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    // 7. ユーザー削除
+    // データ更新
+    public boolean updateUser(User user) {
+        String sql = "UPDATE users SET email=?, password=?, username=? WHERE id=?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, user.getEmail());
+            pstmt.setString(2, user.getPassword());
+            pstmt.setString(3, user.getUsername());
+            pstmt.setInt(4, user.getId());
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // データ削除
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setInt(1, id);
             return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
+    
+    // username をもとにユーザー情報を取得する
+    public User getUserByUsername(String username) {
+        String sql = "SELECT id, email, password, username FROM users WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("username")
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    
+    // username を更新する
+    public boolean updateUsername(String currentUsername, String newUsername) {
+        String sql = "UPDATE users SET username = ? WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newUsername);
+            pstmt.setString(2, currentUsername);
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    // username をキーに email を更新する
+    public boolean updateEmailByUsername(String username, String newEmail) {
+        String sql = "UPDATE users SET email = ? WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newEmail);
+            pstmt.setString(2, username);
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    // username をキーに password を更新する
+    public boolean updatePasswordByUsername(String username, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE username = ? AND user_del IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, username);
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    
+    
+ // 検索（ID / email / username の部分一致）
+    public List<User> searchUsers(String keyword) {
+        List<User> list = new ArrayList<>();
+
+        String sql =
+            "SELECT id, email, password, username " +
+            "FROM users " +
+            "WHERE user_del IS NULL " +
+            "AND (" +
+            "CAST(id AS CHAR) LIKE ? " +
+            "OR email LIKE ? " +
+            "OR username LIKE ?" +
+            ")";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            String like = "%" + keyword + "%";
+            pstmt.setString(1, like);
+            pstmt.setString(2, like);
+            pstmt.setString(3, like);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                list.add(new User(
+                    rs.getInt("id"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getString("username")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    
+    
+    
+ // 論理削除
+    public boolean logicalDeleteUser(int id) {
+        String sql = "UPDATE users SET user_del = NOW() WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+ // 管理者のみ取得
+    public List<User> getManagerUsers() {
+        List<User> list = new ArrayList<>();
+
+        String sql =
+            "SELECT id, email, password, username, manager_flag " +
+            "FROM users " +
+            "WHERE user_del IS NULL AND manager_flag = 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getString("username"),
+                    rs.getInt("manager_flag")
+                );
+                list.add(user);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+ // 管理者検索
+    public List<User> searchManagerUsers(String keyword) {
+        List<User> list = new ArrayList<>();
+
+        String sql =
+            "SELECT id, email, password, username, manager_flag " +
+            "FROM users " +
+            "WHERE user_del IS NULL " +
+            "AND manager_flag = 1 " +
+            "AND (" +
+            "CAST(id AS CHAR) LIKE ? " +
+            "OR email LIKE ? " +
+            "OR username LIKE ?" +
+            ")";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            String like = "%" + keyword + "%";
+            pstmt.setString(1, like);
+            pstmt.setString(2, like);
+            pstmt.setString(3, like);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                list.add(new User(
+                    rs.getInt("id"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getString("username"),
+                    rs.getInt("manager_flag")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    public User findById(int userId) {
+
+        User user = null;
+
+        String sql = "SELECT id, email, username FROM users WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new User(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("username")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+
+
+
 }
