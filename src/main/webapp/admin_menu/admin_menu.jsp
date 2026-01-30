@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>管理者メニュー</title>
-<link rel="stylesheet" type="text/css" href="../css/admin_menu.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/admin_menu.css">
 </head>
 <body>
 <div class="header">
@@ -17,7 +17,7 @@
 <input type="text" value="200" readonly> 人
 </div>
 <div class="menu-buttons">
-<form action="${pageContext.request.contextPath}/admin/inquiry" method="get">
+<form action="${pageContext.request.contextPath}/inquiry_manage" method="get">
 <button type="submit">お問い合わせ内容</button>
 </form>
 <form action="../user_info_list/user_info_list.jsp" method="get">

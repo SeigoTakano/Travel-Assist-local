@@ -134,4 +134,23 @@ public class UserDao {
             throw new RuntimeException("ハッシュ化に失敗しました", e);
         }
     }
+    
+ // 8. メールアドレス更新 (ID指定・引数2つバージョン)
+    public boolean updateEmailById(int id, String newEmail) {
+        // 更新者は本人なので、本来はユーザー名を入れたいところですが、
+        // 引数に合わせるため update_user には email を流用するか固定値を入れます
+        String sql = "UPDATE users SET email = ?, update_date = NOW(), update_user = ? WHERE id = ? AND user_del IS NULL";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, newEmail);
+            pstmt.setString(2, newEmail); // 更新者として新しいメアドを仮セット
+            pstmt.setInt(3, id);
+            
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { 
+            e.printStackTrace(); 
+        }
+        return false;
+    }
 }
