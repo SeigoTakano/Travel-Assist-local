@@ -1,0 +1,217 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+  background: #f2f2f2;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 60px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  background: #8ec0f4;
+  color: #fff;
+}
+
+.header h1 {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+}
+
+.menu-btn,
+.user-btn {
+  background: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-btn {
+  padding: 6px 12px;
+  border-radius: 5%;
+}
+
+.user-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 20px;
+  border-radius: 50%;
+}
+
+.container,
+.layout {
+  display: flex;
+}
+
+.sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 60px);
+  padding: 16px;
+  background: #fff;
+  overflow-y: auto;
+  border-right: 1px solid #fff;
+}
+
+.sidebar ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.side-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar li.active .side-btn {
+  background: #e6f0ff;
+}
+
+.main {
+  flex: 1;
+  margin-top: 60px;
+  margin-left: 220px;
+  height: calc(100vh - 60px);
+  padding: 24px;
+  background: #ffffff;
+  overflow-y: auto;
+  padding-bottom: 80px;
+}
+
+.search-area {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.w100 {
+  width: 100px;
+}
+
+.w200 {
+  width: 200px;
+}
+
+.w500 {
+  width: 500px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.copy-target {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.copy-target:hover {
+  color: #4a90e2;
+}
+
+.card-body {
+  display: flex;
+  gap: 12px;
+}
+
+.inquiry {
+  width: 600px;
+  height: 200px;
+  resize: none;
+  overflow-y: auto;
+}
+
+.card-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.reply-btn {
+  margin-top: 8px;
+  padding: 6px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.edit {
+  font-size: 12px;
+  text-align: right;
+}
+
+.inquiry-list {
+  min-height: 100%;
+}
+
+#toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+#toast.show {
+  opacity: 1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pagination button {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: #4a90e2;
+  color: #fff;
+  border-color: #4a90e2;
+}
