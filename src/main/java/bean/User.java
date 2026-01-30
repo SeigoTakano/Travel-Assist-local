@@ -1,13 +1,7 @@
 package bean;
-<<<<<<< HEAD
  
 import java.io.Serializable;
- 
-=======
 
-import java.io.Serializable;
-
->>>>>>> branch 'master' of https://github.com/SeigoTakano/Travel-Assist-local.git
 public class User implements Serializable {
     private int id;
     private String email;
@@ -15,17 +9,9 @@ public class User implements Serializable {
     private String username;
     private boolean managerFlag; // 1なら管理者
     private boolean adminFlag;   // managerFlagと両方1ならスーパー管理者
-<<<<<<< HEAD
- 
-=======
 
->>>>>>> branch 'master' of https://github.com/SeigoTakano/Travel-Assist-local.git
     public User() {}
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> branch 'master' of https://github.com/SeigoTakano/Travel-Assist-local.git
+    
     public User(int id, String email, String password, String username, boolean managerFlag, boolean adminFlag) {
         this.id = id;
         this.email = email;
@@ -34,11 +20,16 @@ public class User implements Serializable {
         this.managerFlag = managerFlag;
         this.adminFlag = adminFlag;
     }
-<<<<<<< HEAD
- 
-=======
+    
+    public User(int id, String email, String password, String username) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.managerFlag = false;
+        this.adminFlag = false;
+    }
 
->>>>>>> branch 'master' of https://github.com/SeigoTakano/Travel-Assist-local.git
     // Getter & Setter
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
