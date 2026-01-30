@@ -4,6 +4,14 @@ body {
     font-family: Arial, sans-serif;
 }
 
+
+/* メインコンテンツ共通 */
+.main {
+    flex: 1;              /* ← これが最重要 */
+    min-width: 0;         /* ← 横スクロール防止の決定打 */
+    box-sizing: border-box;
+}
+
 /* ===== ヘッダー ===== */
 .header {
 	position: fixed;      /* 追加 */
@@ -17,6 +25,23 @@ body {
     padding: 0 16px;
     box-sizing: border-box;
     z-index: 1000;        /* 追加（他要素より前） */
+}
+/* 右上のプロフィールアイコン */
+
+.account-btn {
+
+    position: absolute;
+
+    right: 20px;
+
+    top: 5px;
+
+    cursor: pointer;
+
+    font-size: 28px;
+
+    color: white;
+
 }
 
 .menu-btn {
@@ -54,17 +79,57 @@ body {
 
 .sidebar li {
     margin-bottom: 12px;
+    flex-shrink: 0;
 }
 
-/* ===== メインコンテンツ ===== */
-.content {
-    flex: 1;
-    padding: 20px;
-}
+
+
 
 /* ===== レイアウト ===== */
 .container {
     display: flex;
     margin-top: 60px;   /* ← ヘッダーの高さ分 */
+    width: 100%;
+}
+
+
+/* 管理者情報ボックス */
+
+.right-box {
+
+    background: white;
+
+    width: 250px;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 0 8px #ccc;
+
+    position: fixed;
+
+    right: 40px;
+
+    top: 70px;
+
+    display: none;
+
+}
+
+/* ログアウト */
+
+.logout button {
+
+    background: none;
+
+    border: none;
+
+    color: red;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
 }
 
