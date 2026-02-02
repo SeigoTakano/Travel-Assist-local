@@ -36,8 +36,8 @@
 <br><br>
 <button type="submit">パスワード変更</button>
 </form>
-<form action="LogoutServlet" method="post" class="logout">
-<button>ログアウト</button>
+<form action="<%= request.getContextPath() %>/logout" method="post" class="logout">
+    <button type="submit">ログアウト</button>
 </form>
 </div>
 <script>

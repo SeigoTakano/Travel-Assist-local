@@ -43,8 +43,8 @@
         </div>
 
         <div class="link-group d-flex justify-content-between mb-3">
-          <a href="register.jsp" class="text-decoration-none small">新規登録</a>
-          <a href="forgot.jsp" class="text-decoration-none small">パスワードをお忘れの方</a>
+          <a href="${pageContext.request.contextPath}/login/register.jsp" class="text-decoration-none small">新規登録</a>
+          <a href="${pageContext.request.contextPath}/login/forgot.jsp" class="text-decoration-none small">パスワードをお忘れの方</a>
         </div>
 
         <button class="w-100 btn btn-lg btn-primary" type="submit">ログイン</button>
