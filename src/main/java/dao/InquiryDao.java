@@ -13,8 +13,8 @@ public class InquiryDao {
 
         String sql = """
             INSERT INTO inquiry
-            (email, name, inquiry_detail, create_date, create_user, update_date, update_user)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (email, name, inquiry_detail, create_date, create_user, update_date, update_user, category)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -22,12 +22,12 @@ public class InquiryDao {
 
             ps.setString(1, inquiry.getEmail());
             ps.setString(2, inquiry.getName());
-            ps.setString(3, inquiry.getMessage()); // ★ message
-
+            ps.setString(3, inquiry.getMessage());
             ps.setTimestamp(4, inquiry.getCreatedAt());
-            ps.setString(5, inquiry.getName());     // create_user は name を流用
+            ps.setString(5, inquiry.getName());
             ps.setTimestamp(6, inquiry.getUpdatedAt());
             ps.setString(7, inquiry.getName());
+            ps.setString(8, inquiry.getCategory());
 
             return ps.executeUpdate() > 0;
 

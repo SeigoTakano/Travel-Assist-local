@@ -72,8 +72,19 @@ function renderPosts(posts) {
             </div>
         </article>
     `).join('');
+    
+    // 投稿クリックで詳細ページに飛ばす
+    document.querySelectorAll('.post-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            // 画像クリック時のオーバーレイ表示はここで止める
+            if (e.target.classList.contains('post-image')) return;
 
-    // 画像拡大イベントを追加
+            const postId = card.dataset.postId;
+            window.location.href = `${contextPath}/read_post/read_post.jsp?id=${postId}`;
+        });
+    });
+
+    // 画像拡大イベント
     const overlay = document.getElementById('zoom-overlay');
     document.querySelectorAll('.post-image').forEach(img => {
         img.addEventListener('click', () => {

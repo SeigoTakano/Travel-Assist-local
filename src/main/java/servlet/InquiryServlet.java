@@ -65,7 +65,8 @@ public class InquiryServlet extends HttpServlet {
         Inquiry inquiry = new Inquiry();
         inquiry.setEmail(email);
         inquiry.setName(name);
-        inquiry.setMessage(select + "： " + detail);
+        inquiry.setCategory(select);
+        inquiry.setMessage(detail);
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
         inquiry.setCreatedAt(now);
